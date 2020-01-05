@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.gavinsappcreations.sunrisesunsettimes.home.HomeViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/top_bar_background"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@id/horizontal_bar"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/location_imageView"
+            android:alpha="0.6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginLeft="@dimen/margin_normal"
+            android:src="@drawable/ic_map_marker_black_24dp" />
+
+        <TextView
+            android:id="@+id/location_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_top_icon"
+            android:layout_weight="1"
+            android:text="@{viewModel.city}"
+            tools:text="Finding location..."
+            app:layout_constraintTop_toTopOf="@id/location_imageView"
+            app:layout_constraintLeft_toRightOf="@id/location_imageView"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+        <ImageView
+            android:id="@+id/date_imageView"
+            android:alpha="0.6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/location_imageView"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginLeft="@dimen/margin_normal"
+            android:src="@drawable/baseline_today_black_24" />
+
+        <TextView
+            android:id="@+id/date_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_top_icon"
+            android:layout_weight="1"
+            android:text="Today"
+            app:layout_constraintTop_toTopOf="@id/date_imageView"
+            app:layout_constraintLeft_toRightOf="@id/date_imageView"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+        <ImageView
+            android:id="@+id/online_imageView"
+            android:alpha="0.6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/date_imageView"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginLeft="@dimen/margin_normal"
+            android:src="@drawable/baseline_cloud_queue_black_24" />
+
+        <TextView
+            android:id="@+id/online_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_small"
+            android:layout_weight="1"
+            android:text="Online"
+            app:layout_constraintTop_toTopOf="@id/online_imageView"
+            app:layout_constraintLeft_toRightOf="@id/date_imageView"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+        <Button
+            android:id="@+id/options_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            app:layout_constraintTop_toTopOf="@id/location_imageView"
+            app:layout_constraintBottom_toBottomOf="@id/online_imageView"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textSize="16sp"
+            android:onClick="@{() -> viewModel.onOptionsButtonPressed()}"
+            android:layout_marginRight="@dimen/margin_normal"
+            android:text="@string/location_button"
+            android:textColor="@color/colorAccent" />
+
+        <View
+            android:id="@+id/horizontal_bar"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintTop_toBottomOf="@id/online_imageView"
+            android:background="@android:color/black" />
+
+        <ImageView
+            android:id="@+id/sunrise_imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:src="@drawable/sunrise"
+            app:layout_constraintBottom_toTopOf="@+id/sunrise_textView"
+            app:layout_constraintHeight_percent="0.2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/horizontal_bar"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/sunrise_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_normal"
+            android:text="@{viewModel.sunriseTime}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            app:layout_constraintBottom_toTopOf="@+id/sunset_imageView"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sunrise_imageView"
+            tools:text="Sunrise: 7:29am" />
+
+        <ImageView
+            android:id="@+id/sunset_imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/margin_extra_large"
+            android:src="@drawable/sunset"
+            app:layout_constraintBottom_toTopOf="@+id/sunset_textView"
+            app:layout_constraintHeight_percent="0.2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sunrise_textView" />
+
+        <TextView
+            android:id="@+id/sunset_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.sunsetTime}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sunset_imageView"
+            tools:text="Sunset: 5:41pm" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
