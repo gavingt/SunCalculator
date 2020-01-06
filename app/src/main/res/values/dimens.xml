@@ -7,4 +7,6 @@
     <dimen name="margin_large">32dp</dimen>
     <dimen name="margin_extra_large">64dp</dimen>
     <dimen name="margin_top_icon">10dp</dimen>
+    <dimen name="bottom_sheet_corner_radius">4dp</dimen>
+    <dimen name="bottom_sheet_top_padding">16dp</dimen>
 </resources>

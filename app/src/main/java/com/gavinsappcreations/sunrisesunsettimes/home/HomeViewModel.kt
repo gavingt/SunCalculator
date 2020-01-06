@@ -1,37 +1,35 @@
 package com.gavinsappcreations.sunrisesunsettimes.home
 
+import android.app.Application
 import android.location.Location
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.gavinsappcreations.sunrisesunsettimes.calculations.SunriseSunsetCalculator
-import java.util.*
+import androidx.lifecycle.Transformations
+import com.gavinsappcreations.sunrisesunsettimes.repository.SunRepository
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _location = MutableLiveData<Location>()
-    val location: LiveData<Location>
-        get() = _location
+    private val repository = SunRepository(application)
 
-    fun setCurrentLocation(location: Location) {
-        _location.value = location
+    val location: LiveData<Location> = Transformations.map(repository.latitudeAndLongitude) {
+        //This turns our SharedPreferenceStringLiveData from the repository into a LiveData<Location>
+        if (it.isNotEmpty()) {
+            val locationArray = it.split(",")
+            val newLocation = Location("").apply {
+                latitude = locationArray[0].toDouble()
+                longitude = locationArray[1].toDouble()
+            }
+            newLocation
+        } else {
+            null
+        }
     }
 
 
-    private val _sunriseTime = MutableLiveData<String>()
-    val sunriseTime: LiveData<String>
-        get() = _sunriseTime
+    val sunriseTime = repository.sunriseTime
+    val sunsetTime = repository.sunsetTime
 
-    private val _sunsetTime = MutableLiveData<String>()
-    val sunsetTime: LiveData<String>
-        get() = _sunsetTime
-
-    fun calculateSunriseSunsetTimes(location: Location) {
-        val calculator = SunriseSunsetCalculator(location, TimeZone.getDefault())
-        val calendar = Calendar.getInstance()
-        _sunriseTime.value = "Sunrise: ${calculator.getOfficialSunriseForDate(calendar)}"
-        _sunsetTime.value = "Sunset: ${calculator.getOfficialSunsetForDate(calendar)}"
-    }
 
     //Request the Options AlertDialog to be shown
     private val _showOptionsAlertDialogEvent = MutableLiveData<Boolean>()

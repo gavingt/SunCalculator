@@ -3,7 +3,6 @@ package com.gavinsappcreations.sunrisesunsettimes.home
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -15,12 +14,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.BuildConfig
-import com.gavinsappcreations.sunrisesunsettimes.R
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.android.material.textfield.TextInputEditText
-import kotlinx.android.synthetic.main.options_alert_dialog_layout.view.*
+import com.gavinsappcreations.sunrisesunsettimes.repository.SunRepository
+
 
 const val REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE = 1
 
@@ -35,12 +31,17 @@ const val REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE = 1
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+//    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var alertDialog: AlertDialog? = null
 
     private val viewModel: HomeViewModel by lazy {
-        ViewModelProviders.of(this).get(HomeViewModel::class.java)
+        val activity = requireNotNull(this.activity) {
+            "You can only access the viewModel after onActivityCreated()"
+        }
+        ViewModelProviders.of(this, HomeViewModelFactory(activity.application))
+            .get(HomeViewModel::class.java)
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,13 +55,6 @@ class HomeFragment : Fragment() {
 
         // Giving the binding access to the OfflineViewModel
         binding.viewModel = viewModel
-
-        //Observe location
-        viewModel.location.observe(this, Observer {
-            it?.let {
-                viewModel.calculateSunriseSunsetTimes(it)
-            }
-        })
 
         viewModel.showOptionsAlertDialogEvent.observe(this, Observer {
             if (it == true) {
@@ -79,7 +73,7 @@ class HomeFragment : Fragment() {
     //TODO: when a change is made in BottomSheet, store it right into SharedPreferences
     //This shows the AlertDialog that lets you change location, date, and toggle online/offline fetching.
     private fun showOptionsAlertDialog() {
-        alertDialog?.dismiss()
+/*        alertDialog?.dismiss()
 
         val inflater = LayoutInflater.from(requireActivity())
         val optionsLayout: View = inflater.inflate(
@@ -102,7 +96,15 @@ class HomeFragment : Fragment() {
         builder.setTitle("Options")
         builder.setView(optionsLayout)
         alertDialog = builder.create()
-        alertDialog?.show()
+        alertDialog?.show()*/
+
+
+        val addPhotoBottomDialogFragment: RoundedBottomSheetDialogFragment =
+            RoundedBottomSheetDialogFragment.newInstance()
+        addPhotoBottomDialogFragment.show(
+            requireActivity().supportFragmentManager,
+            "options_dialog_fragment"
+        )
     }
 
 
@@ -172,13 +174,11 @@ class HomeFragment : Fragment() {
         if (permissions.isEmpty() || grantResults.isEmpty()) {
             return
         }
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { // Permission was granted.
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                // Got last known location. In some rare situations this can be null.
-                location ?: return@addOnSuccessListener
-                viewModel.setCurrentLocation(location)
-            }
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Permission was granted.
+            val repository = SunRepository(requireActivity().application)
+            repository.updateLocation()
+
         } else { // Permission was denied and user checked the "Don't ask again" checkbox.
             showUserDeniedPermissionsAlertDialog(true)
         }
