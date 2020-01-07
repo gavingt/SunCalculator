@@ -31,26 +31,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val sunsetTime = repository.sunsetTime
 
 
-    //Request the Options AlertDialog to be shown
-    private val _showOptionsAlertDialogEvent = MutableLiveData<Boolean>()
-    val showOptionsAlertDialogEvent: LiveData<Boolean>
-        get() = _showOptionsAlertDialogEvent
+    //Request the OptionsBottomSheet to be shown
+    private val _showOptionsBottomSheetEvent = MutableLiveData<Boolean>()
+    val showOptionsBottomSheetEvent: LiveData<Boolean>
+        get() = _showOptionsBottomSheetEvent
 
     fun onOptionsButtonPressed() {
-        _showOptionsAlertDialogEvent.value = true
+        _showOptionsBottomSheetEvent.value = true
     }
 
-    fun doneShowingOptionsAlertDialog() {
-        _showOptionsAlertDialogEvent.value = false
+    fun doneShowingOptionsBottomSheet() {
+        _showOptionsBottomSheetEvent.value = false
     }
 
-
-    private val _city = MutableLiveData<String>()
-    val city: LiveData<String>
-        get() = _city
-
-    fun setCity(city: String) {
-        _city.value = city
-    }
 
 }

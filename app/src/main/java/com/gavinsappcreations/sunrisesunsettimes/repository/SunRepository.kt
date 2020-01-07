@@ -41,48 +41,19 @@ class SunRepository(application: Application) {
     val fetchingDataOnline = SharedPreferenceBooleanLiveData(prefs, FETCHING_DATA_ONLINE_KEY, false)
 
 
-
-    fun updateSunData() {
-        val latLongString = prefs.getString(LATITUDE_AND_LONGITUDE_KEY, "")
-
-        if (latLongString.isNullOrEmpty()) {
-            return
-        }
-
-        val latLongArray = latLongString.split(",")
-            val location = Location("").apply {
-                latitude = latLongArray[0].toDouble(); longitude = latLongArray[1].toDouble()}
-
-            val sunriseString: String
-            val sunsetString: String
-
-            //TODO: change default to true
-            if (prefs.getBoolean(FETCHING_DATA_ONLINE_KEY, false)) {
-                //TODO: handle online fetching of data
-                sunriseString = "TODO: fetch sunrise online"
-                sunsetString = "TODO: fetch sunset online"
-            } else {
-                val calculator = SunriseSunsetCalculator(location, TimeZone.getDefault())
-                val calendar = Calendar.getInstance()
-                sunriseString = "Sunrise: ${calculator.getOfficialSunriseForDate(calendar)}"
-                sunsetString = "Sunset: ${calculator.getOfficialSunsetForDate(calendar)}"
-            }
-
-            prefs.edit().putString(
-                SUNRISE_TIME_KEY,
-                sunriseString
-            )
-                .putString(
-                    SUNSET_TIME_KEY,
-                    sunsetString
-                ).apply()
-        }
-
-
     fun updateDate() {
 
     }
 
+
+    //Handle storing a new city name.
+    fun updateCity() {
+        //TODO: use PlaceAutocomplete for finding just city names
+    }
+
+
+    //Handle what to do when a new location of interest is chosen,
+    //either from fusedLocation or the user's custom location selection.
     fun updateLocation() {
         if (prefs.getBoolean(USING_CURRENT_LOCATION_KEY, true)) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
@@ -101,6 +72,8 @@ class SunRepository(application: Application) {
         updateSunData()
     }
 
+
+    //Update the SharedPreference value that stores that latitude and longitude of the location of interest.
     private fun updateCurrentLocationPref(newLocation: Location) {
         prefs.edit()
             .putString(
@@ -109,6 +82,46 @@ class SunRepository(application: Application) {
             )
             .apply()
     }
+
+
+
+    private fun updateSunData() {
+        val latLongString = prefs.getString(LATITUDE_AND_LONGITUDE_KEY, "")
+
+        if (latLongString.isNullOrEmpty()) {
+            return
+        }
+
+        val latLongArray = latLongString.split(",")
+        val location = Location("").apply {
+            latitude = latLongArray[0].toDouble(); longitude = latLongArray[1].toDouble()}
+
+        val sunriseString: String
+        val sunsetString: String
+
+        //TODO: change default to true
+        if (prefs.getBoolean(FETCHING_DATA_ONLINE_KEY, false)) {
+            //TODO: handle online fetching of data
+            sunriseString = "TODO: fetch sunrise online"
+            sunsetString = "TODO: fetch sunset online"
+        } else {
+            val calculator = SunriseSunsetCalculator(location, TimeZone.getDefault())
+            val calendar = Calendar.getInstance()
+            sunriseString = "Sunrise: ${calculator.getOfficialSunriseForDate(calendar)}"
+            sunsetString = "Sunset: ${calculator.getOfficialSunsetForDate(calendar)}"
+        }
+
+        prefs.edit().putString(
+            SUNRISE_TIME_KEY,
+            sunriseString
+        )
+            .putString(
+                SUNSET_TIME_KEY,
+                sunsetString
+            ).apply()
+    }
+
+
 
 
 

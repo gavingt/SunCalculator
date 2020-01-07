@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.BuildConfig
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
+import com.gavinsappcreations.sunrisesunsettimes.options.OptionsBottomSheetFragment
 import com.gavinsappcreations.sunrisesunsettimes.repository.SunRepository
 
 
@@ -31,7 +32,7 @@ const val REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE = 1
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
-//    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     private var alertDialog: AlertDialog? = null
 
     private val viewModel: HomeViewModel by lazy {
@@ -56,10 +57,10 @@ class HomeFragment : Fragment() {
         // Giving the binding access to the OfflineViewModel
         binding.viewModel = viewModel
 
-        viewModel.showOptionsAlertDialogEvent.observe(this, Observer {
+        viewModel.showOptionsBottomSheetEvent.observe(this, Observer {
             if (it == true) {
-                showOptionsAlertDialog()
-                viewModel.doneShowingOptionsAlertDialog()
+                showOptionsBottomSheet()
+                viewModel.doneShowingOptionsBottomSheet()
             }
         })
 
@@ -68,42 +69,11 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    //TODO: use SharedPreferences to share data between AlertDialog and Fragment
-    //TODO: use ModalBottomSheet instead for options (put all options right in bottomSheet)?
-    //TODO: when a change is made in BottomSheet, store it right into SharedPreferences
-    //This shows the AlertDialog that lets you change location, date, and toggle online/offline fetching.
-    private fun showOptionsAlertDialog() {
-/*        alertDialog?.dismiss()
-
-        val inflater = LayoutInflater.from(requireActivity())
-        val optionsLayout: View = inflater.inflate(
-            R.layout.options_alert_dialog_layout,
-            requireActivity().findViewById(R.id.change_options_alert_dialog_layout_root)
-        )
-
-        val cityEditText = optionsLayout.findViewById<TextInputEditText>(R.id.city_editText)
-        cityEditText.setText(viewModel.city.value)
-
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setPositiveButton(
-            "Confirm"
-        ) { dialog, id ->
-            viewModel.setCity(cityEditText.text.toString())
-        }
-        builder.setNegativeButton("Cancel") { dialog, id ->
-            alertDialog?.dismiss()
-        }
-        builder.setTitle("Options")
-        builder.setView(optionsLayout)
-        alertDialog = builder.create()
-        alertDialog?.show()*/
-
-
-        val addPhotoBottomDialogFragment: RoundedBottomSheetDialogFragment =
-            RoundedBottomSheetDialogFragment.newInstance()
-        addPhotoBottomDialogFragment.show(
+    //This shows the OptionsBottomSheet that lets you change location, date, and toggle online/offline fetching.
+    private fun showOptionsBottomSheet() {
+        OptionsBottomSheetFragment().show(
             requireActivity().supportFragmentManager,
-            "options_dialog_fragment"
+            "options_fragment"
         )
     }
 
@@ -153,7 +123,7 @@ class HomeFragment : Fragment() {
             }
         }
         builder.setNegativeButton("Choose location manually") { dialog, id ->
-            //TODO: show "choose location" alertDialog by triggering an event in HomeViewModel
+            //TODO: show optionsBottomSheet by triggering an event in HomeViewModel
             alertDialog?.dismiss()
         }
         builder.setTitle("App needs a location")

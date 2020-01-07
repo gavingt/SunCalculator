@@ -90,16 +90,17 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/date_imageView"
             app:layout_constraintLeft_toLeftOf="parent"
+            android:paddingBottom="@dimen/margin_extra_extra_small"
             android:layout_marginBottom="@dimen/margin_small"
             android:layout_marginLeft="@dimen/margin_normal"
             android:src="@drawable/ic_map_marker_black_24dp" />
 
         <TextView
             android:id="@+id/location_textView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginLeft="@dimen/margin_small"
-            android:text="@{viewModel.city}"
+            android:text="City name"
             tools:text="Finding location..."
             app:layout_constraintTop_toTopOf="@id/location_imageView"
             app:layout_constraintBottom_toBottomOf="@id/location_imageView"
@@ -120,8 +121,8 @@
 
         <TextView
             android:id="@+id/date_textView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginLeft="@dimen/margin_small"
             android:layout_weight="1"
             android:text="Today"
@@ -144,8 +145,8 @@
 
         <TextView
             android:id="@+id/online_textView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginLeft="@dimen/margin_small"
             android:text="Online"
             app:layout_constraintTop_toTopOf="@id/online_imageView"
