@@ -25,9 +25,9 @@ const val REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE = 1
 //TODO: make it work when permission denied
 //TODO: make online work
 //TODO: add datepicker
-//TODO: add location picker (place autocomplete), use https://stackoverflow.com/questions/49497270/autocomplete-only-city-name-list-using-google-maps-api
-//TODO: when changing location, do we change time zone as well? (ideally yes)
-//TODO: repository is where we both fetch and retrieve web and offline sunset data
+//TODO: remove offline functionality if it's the same result as online
+//TODO: fix edge cases with location picker (leaving it blank, etc...)
+//TODO: check dates and places where daylight savings is active, to check for math errors in SolarEventCalculator caused by me changing code
 
 class HomeFragment : Fragment() {
 
@@ -61,6 +61,12 @@ class HomeFragment : Fragment() {
             if (it == true) {
                 showOptionsBottomSheet()
                 viewModel.doneShowingOptionsBottomSheet()
+            }
+        })
+
+        viewModel.usingCurrentLocation.observe(this, Observer {
+            if (it == true) {
+                requestLocationPermission()
             }
         })
 
@@ -147,7 +153,7 @@ class HomeFragment : Fragment() {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // Permission was granted.
             val repository = SunRepository(requireActivity().application)
-            repository.updateLocation()
+            repository.updateLocation(null)
 
         } else { // Permission was denied and user checked the "Don't ask again" checkbox.
             showUserDeniedPermissionsAlertDialog(true)

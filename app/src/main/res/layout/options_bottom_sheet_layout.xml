@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="com.gavinsappcreations.sunrisesunsettimes.options.OptionsViewModel" />
@@ -15,8 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingTop="@dimen/margin_normal"
-        android:paddingBottom="@dimen/margin_normal">
+        android:padding="@dimen/margin_normal">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -49,38 +49,110 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@android:color/white"
+                app:contentPadding="@dimen/margin_normal"
                 app:layout_constraintLeft_toLeftOf="@id/datePicker_cardView"
                 app:layout_constraintRight_toRightOf="@id/datePicker_cardView"
                 app:layout_constraintTop_toBottomOf="@id/title_textView">
 
-                <fragment
-                    android:id="@+id/autocomplete_fragment"
-                    android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/location_title_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/margin_normal"
+                        android:text="Location"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <RadioGroup
+                        android:id="@+id/location_radioGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginRight="@dimen/margin_small"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/location_title_textView">
+
+                        <RadioButton
+                            android:id="@+id/current_location_radioButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="@{viewModel.usingCurrentLocation}"
+                            android:paddingLeft="@dimen/margin_small"
+                            android:text="Use current location " />
+
+                        <RadioButton
+                            android:id="@+id/custom_location_radioButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="@{!viewModel.usingCurrentLocation}"
+                            android:paddingLeft="@dimen/margin_small"
+                            android:text="Use custom location" />
+
+                    </RadioGroup>
+
+                    <FrameLayout
+                        android:id="@+id/autocomplete_frameLayout"
+                        visibleIfUsingCustomLocation="@{viewModel.usingCurrentLocation}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_normal"
+                        android:background="@drawable/rounded_rectangle"
+                        app:layout_constraintTop_toBottomOf="@id/location_radioGroup">
+
+                        <fragment
+                            android:id="@+id/autocomplete_fragment"
+                            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/datePicker_cardView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_28dp"
+                android:layout_marginTop="@dimen/margin_normal"
                 app:cardBackgroundColor="@android:color/white"
+                app:contentPadding="@dimen/margin_normal"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/autocomplete_cardView">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                <DatePicker
-                    android:id="@+id/datePicker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin_normal"
-                    android:layout_marginRight="@dimen/margin_normal"
-                    android:calendarViewShown="false"
-                    android:datePickerMode="spinner"
-                    android:text="Change date" />
+                    <TextView
+                        android:id="@+id/date_title_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Date"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <DatePicker
+                        android:id="@+id/datePicker"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-20dp"
+                        android:year=""
+                        android:layout_marginBottom="-24dp"
+                        android:calendarViewShown="false"
+                        android:datePickerMode="spinner" />
+
+                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
@@ -88,7 +160,7 @@
                 android:id="@+id/online_cardView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_28dp"
+                android:layout_marginTop="@dimen/margin_normal"
                 android:layout_marginBottom="@dimen/margin_normal"
                 app:cardBackgroundColor="@android:color/white"
                 app:contentPadding="@dimen/margin_normal"
@@ -98,29 +170,45 @@
                 app:layout_constraintRight_toRightOf="@id/datePicker_cardView"
                 app:layout_constraintTop_toBottomOf="@id/datePicker_cardView">
 
-                <RadioGroup
-                    android:id="@+id/online_radioGroup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginRight="@dimen/margin_small">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                    <RadioButton
-                        android:id="@+id/online_radioButton"
+                    <TextView
+                        android:id="@+id/online_title_textView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:paddingLeft="@dimen/margin_small"
-                        android:text="Fetch sunset data online" />
+                        android:paddingBottom="@dimen/margin_normal"
+                        android:text="Fetch method"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                    <RadioButton
-                        android:id="@+id/offline_radioButton"
-                        android:layout_width="wrap_content"
+                    <RadioGroup
+                        android:id="@+id/online_radioGroup"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin_small"
-                        android:text="Fetch sunset data locally" />
+                        android:layout_marginRight="@dimen/margin_small">
 
-                </RadioGroup>
+                        <RadioButton
+                            android:id="@+id/online_radioButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:paddingLeft="@dimen/margin_small"
+                            android:text="Fetch sun data online" />
+
+                        <RadioButton
+                            android:id="@+id/offline_radioButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="@dimen/margin_small"
+                            android:text="Fetch sun data locally" />
+
+                    </RadioGroup>
+
+                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 

@@ -7,28 +7,33 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.gavinsappcreations.sunrisesunsettimes.repository.SunRepository
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.model.Place
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = SunRepository(application)
 
-    val location: LiveData<Location> = Transformations.map(repository.latitudeAndLongitude) {
-        //This turns our SharedPreferenceStringLiveData from the repository into a LiveData<Location>
+    val place: LiveData<Place> = Transformations.map(repository.place) {
+        //This turns our SharedPreferenceStringLiveData from the repository into a LiveData<Place>
         if (it.isNotEmpty()) {
-            val locationArray = it.split(",")
-            val newLocation = Location("").apply {
-                latitude = locationArray[0].toDouble()
-                longitude = locationArray[1].toDouble()
-            }
-            newLocation
+            val placeArray = it.split(",")
+            val placeBuilder = Place.builder()
+            placeBuilder.setLatLng(LatLng(placeArray[0].toDouble(), placeArray[1].toDouble()))
+            placeBuilder.setName(placeArray[2])
+            placeBuilder.setUtcOffsetMinutes(placeArray[3].toInt())
+            placeBuilder.build()
         } else {
             null
         }
     }
 
+    val usingCurrentLocation = repository.usingCurrentLocation
+
 
     val sunriseTime = repository.sunriseTime
     val sunsetTime = repository.sunsetTime
+
 
 
     //Request the OptionsBottomSheet to be shown

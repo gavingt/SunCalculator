@@ -3,42 +3,50 @@ package com.gavinsappcreations.sunrisesunsettimes.repository
 import android.app.Application
 import android.content.SharedPreferences
 import android.location.Location
-import android.util.Log
-import android.widget.Toast
 import androidx.preference.PreferenceManager
+import com.gavinsappcreations.sunrisesunsettimes.R
 import com.gavinsappcreations.sunrisesunsettimes.calculations.SunriseSunsetCalculator
 import com.gavinsappcreations.sunrisesunsettimes.utilities.SharedPreferenceBooleanLiveData
 import com.gavinsappcreations.sunrisesunsettimes.utilities.SharedPreferenceStringLiveData
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.model.Place
 import java.util.*
 
-const val SUNRISE_TIME_KEY = "rise_time"
-const val SUNSET_TIME_KEY = "set_time"
-const val LATITUDE_AND_LONGITUDE_KEY = "lat_long"
-const val USING_CURRENT_LOCATION_KEY = "custom_location"
-const val FETCHING_DATA_ONLINE_KEY = "fetch_online"
+
+const val KEY_SUNRISE_TIME = "rise_time"
+const val KEY_SUNSET_TIME = "set_time"
+const val KEY_PLACE = "place"
+const val KEY_USING_CURRENT_LOCATION = "current_location"
+const val KEY_FETCHING_DATA_ONLINE = "fetch_online"
 
 
-//This is a simplified repository where we use LiveSharedPreferences instead of a database
-class SunRepository(application: Application) {
+//In this repository we use LiveSharedPreferences instead of a database
+class SunRepository(val application: Application) {
 
     //This is used any time we want to fetch a preference
-    private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
+    private val prefs: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(application)
 
     private var fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
 
-    val sunriseTime = SharedPreferenceStringLiveData(prefs, SUNRISE_TIME_KEY, "")
-    val sunsetTime = SharedPreferenceStringLiveData(prefs, SUNSET_TIME_KEY, "")
+    val sunriseTime = SharedPreferenceStringLiveData(prefs, KEY_SUNRISE_TIME, "")
+    val sunsetTime = SharedPreferenceStringLiveData(prefs, KEY_SUNSET_TIME, "")
 
-    //This is the latitude and longitude of the location of interest, separated by a comma (no spaces)
-    val latitudeAndLongitude = SharedPreferenceStringLiveData(prefs, LATITUDE_AND_LONGITUDE_KEY, "")
+    /*
+    *  This is the latitude, longitude, city name, and UTC offset of the place of interest,
+    *  separated by commas (with no spaces)
+    */
+    val place = SharedPreferenceStringLiveData(prefs, KEY_PLACE, "")
+
 
     //If we're fetching sun times at the current location, this will be true.
     //If user sets a custom location, this will be false.
-    val usingCurrentLocation = SharedPreferenceBooleanLiveData(prefs, USING_CURRENT_LOCATION_KEY, true)
+    val usingCurrentLocation =
+        SharedPreferenceBooleanLiveData(prefs, KEY_USING_CURRENT_LOCATION, true)
 
     //TODO: change defValue to true
-    val fetchingDataOnline = SharedPreferenceBooleanLiveData(prefs, FETCHING_DATA_ONLINE_KEY, false)
+    val fetchingDataOnline = SharedPreferenceBooleanLiveData(prefs, KEY_FETCHING_DATA_ONLINE, false)
 
 
     fun updateDate() {
@@ -46,86 +54,89 @@ class SunRepository(application: Application) {
     }
 
 
-    //Handle storing a new city name.
-    fun updateCity() {
-        //TODO: use PlaceAutocomplete for finding just city names
+    fun updateUsingCurrentLocation(usingCurrentLocation: Boolean) {
+        prefs.edit().putBoolean(KEY_USING_CURRENT_LOCATION, usingCurrentLocation).apply()
     }
 
 
     //Handle what to do when a new location of interest is chosen,
     //either from fusedLocation or the user's custom location selection.
-    fun updateLocation() {
-        if (prefs.getBoolean(USING_CURRENT_LOCATION_KEY, true)) {
+    fun updateLocation(place: Place?) {
+        if (usingCurrentLocation.getValueFromPreferences(KEY_USING_CURRENT_LOCATION, true)) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 // Got last known location. In some rare situations this can be null.
                 location ?: return@addOnSuccessListener
-                updateCurrentLocationPref(location)
+                val placeBuilder = Place.builder()
+                placeBuilder.setLatLng(LatLng(location.latitude, location.longitude))
+                placeBuilder.setName(application.getString(R.string.current_location))
+
+                //TODO: get UTC offset in minutes of current location
+                val tz = TimeZone.getDefault()
+                val now = Date()
+                val utcOffsetMinutes = tz.getOffset(now.time) / 60000
+                placeBuilder.setUtcOffsetMinutes(utcOffsetMinutes)
+
+                updateCurrentPlacePref(placeBuilder.build())
+
+                //Since location has changed, we also need to update sun data
+                updateSunData()
             }
         } else {
-            //TODO: instead of this, get new location info from web
-            val location = Location("")
-            location.apply {latitude = 0.0; longitude = 0.0}
-            updateCurrentLocationPref(location)
+            updateCurrentPlacePref(place)
+            //Since location has changed, we also need to update sun data
+            updateSunData()
         }
-
-        //Since location has changed, we also need to update sun data
-        updateSunData()
     }
 
 
-    //Update the SharedPreference value that stores that latitude and longitude of the location of interest.
-    private fun updateCurrentLocationPref(newLocation: Location) {
-        prefs.edit()
-            .putString(
-                LATITUDE_AND_LONGITUDE_KEY,
-                "${newLocation.latitude},${newLocation.longitude}"
-            )
-            .apply()
+    //Update the SharedPreference value that stores data for the current place of interest
+    private fun updateCurrentPlacePref(newPlace: Place?) {
+        newPlace?.let {
+            prefs.edit()
+                .putString(
+                    KEY_PLACE,
+                    "${newPlace.latLng!!.latitude},${newPlace.latLng!!.longitude},${newPlace.name},${newPlace.utcOffsetMinutes}"
+                )
+                .apply()
+        }
     }
-
 
 
     private fun updateSunData() {
-        val latLongString = prefs.getString(LATITUDE_AND_LONGITUDE_KEY, "")
+        val placeString = prefs.getString(KEY_PLACE, "")
 
-        if (latLongString.isNullOrEmpty()) {
+        if (placeString.isNullOrEmpty()) {
             return
         }
 
-        val latLongArray = latLongString.split(",")
+        val placeArray = placeString.split(",")
         val location = Location("").apply {
-            latitude = latLongArray[0].toDouble(); longitude = latLongArray[1].toDouble()}
+            latitude = placeArray[0].toDouble(); longitude = placeArray[1].toDouble()
+        }
+        val utcOffsetMinutes: Int = placeArray[3].toInt()
 
         val sunriseString: String
         val sunsetString: String
 
         //TODO: change default to true
-        if (prefs.getBoolean(FETCHING_DATA_ONLINE_KEY, false)) {
+        if (prefs.getBoolean(KEY_FETCHING_DATA_ONLINE, false)) {
             //TODO: handle online fetching of data
             sunriseString = "TODO: fetch sunrise online"
             sunsetString = "TODO: fetch sunset online"
         } else {
             val calculator = SunriseSunsetCalculator(location, TimeZone.getDefault())
             val calendar = Calendar.getInstance()
-            sunriseString = "Sunrise: ${calculator.getOfficialSunriseForDate(calendar)}"
-            sunsetString = "Sunset: ${calculator.getOfficialSunsetForDate(calendar)}"
+            sunriseString = "Sunrise: ${calculator.getOfficialSunriseForDateAndUtcOffset(calendar, utcOffsetMinutes)}"
+            sunsetString = "Sunset: ${calculator.getOfficialSunsetForDateAndUtcOffset(calendar, utcOffsetMinutes)}"
         }
 
         prefs.edit().putString(
-            SUNRISE_TIME_KEY,
+            KEY_SUNRISE_TIME,
             sunriseString
         )
             .putString(
-                SUNSET_TIME_KEY,
+                KEY_SUNSET_TIME,
                 sunsetString
             ).apply()
-    }
-
-
-
-
-
-    fun updateFetchOnline() {
-
     }
 }

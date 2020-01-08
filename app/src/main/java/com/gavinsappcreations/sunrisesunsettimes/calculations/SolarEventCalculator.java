@@ -52,9 +52,15 @@ public class SolarEventCalculator {
      * @return the sunrise time, in HH:MM format (24-hour clock), 00:00 if the sun does not rise on the given
      *         date.
      */
-    public String computeSunriseTime(Zenith solarZenith, Calendar date) {
-        return getLocalTimeAsString(computeSolarEventTime(solarZenith, date, true));
+    public String computeSunriseTimeForPresentLocation(Zenith solarZenith, Calendar date) {
+        return getTimeAsString(computeSolarEventTimeForPresentLocation(solarZenith, date, true));
     }
+
+    //Computes the sunrise time for the given zenith at the given date with the given remoteLocationUtcOffsetMinutes
+    public String computeSunriseTimeForRemoteLocation(Zenith solarZenith, Calendar date, int remoteLocationUtcOffsetMinutes) {
+        return getTimeAsString(computeSolarEventTimeForRemoteLocation(solarZenith, date, true, remoteLocationUtcOffsetMinutes));
+    }
+
 
     /**
      * Computes the sunrise time for the given zenith at the given date.
@@ -66,7 +72,7 @@ public class SolarEventCalculator {
      * @return the sunrise time as a calendar or null for no sunrise
      */
     public Calendar computeSunriseCalendar(Zenith solarZenith, Calendar date) {
-        return getLocalTimeAsCalendar(computeSolarEventTime(solarZenith, date, true), date);
+        return getLocalTimeAsCalendar(computeSolarEventTimeForPresentLocation(solarZenith, date, true), date);
     }
 
     /**
@@ -79,8 +85,13 @@ public class SolarEventCalculator {
      * @return the sunset time, in HH:MM format (24-hour clock), 00:00 if the sun does not set on the given
      *         date.
      */
-    public String computeSunsetTime(Zenith solarZenith, Calendar date) {
-        return getLocalTimeAsString(computeSolarEventTime(solarZenith, date, false));
+    public String computeSunsetTimeForPresentLocation(Zenith solarZenith, Calendar date) {
+        return getTimeAsString(computeSolarEventTimeForPresentLocation(solarZenith, date, false));
+    }
+
+    //Computes the sunset time for the given zenith at the given date with the given remoteLocationUtcOffsetMinutes
+    public String computeSunsetTimeForRemoteLocation(Zenith solarZenith, Calendar date, int remoteLocationUtcOffsetMinutes) {
+        return getTimeAsString(computeSolarEventTimeForRemoteLocation(solarZenith, date, false, remoteLocationUtcOffsetMinutes));
     }
 
     /**
@@ -93,15 +104,17 @@ public class SolarEventCalculator {
      * @return the sunset time as a Calendar or null for no sunset.
      */
     public Calendar computeSunsetCalendar(Zenith solarZenith, Calendar date) {
-        return getLocalTimeAsCalendar(computeSolarEventTime(solarZenith, date, false), date);
+        return getLocalTimeAsCalendar(computeSolarEventTimeForPresentLocation(solarZenith, date, false), date);
     }
 
-    private BigDecimal computeSolarEventTime(Zenith solarZenith, Calendar date, boolean isSunrise) {
+    private BigDecimal computeSolarEventTimeForPresentLocation (Zenith solarZenith, Calendar date, boolean isSunrise) {
         date.setTimeZone(this.timeZone);
         BigDecimal longitudeHour = getLongitudeHour(date, isSunrise);
 
         BigDecimal meanAnomaly = getMeanAnomaly(longitudeHour);
         BigDecimal sunTrueLong = getSunTrueLongitude(meanAnomaly);
+
+
         BigDecimal cosineSunLocalHour = getCosineSunLocalHour(sunTrueLong, solarZenith);
         if ((cosineSunLocalHour.doubleValue() < -1.0) || (cosineSunLocalHour.doubleValue() > 1.0)) {
             return null;
@@ -109,9 +122,30 @@ public class SolarEventCalculator {
 
         BigDecimal sunLocalHour = getSunLocalHour(cosineSunLocalHour, isSunrise);
         BigDecimal localMeanTime = getLocalMeanTime(sunTrueLong, longitudeHour, sunLocalHour);
-        BigDecimal localTime = getLocalTime(localMeanTime, date);
-        return localTime;
+
+        return getLocalTime(localMeanTime, date);
     }
+
+    private BigDecimal computeSolarEventTimeForRemoteLocation (Zenith solarZenith, Calendar date, boolean isSunrise, int remoteLocationUtcOffsetMinutes) {
+        date.setTimeZone(this.timeZone);
+        BigDecimal longitudeHour = getLongitudeHour(date, isSunrise);
+
+        BigDecimal meanAnomaly = getMeanAnomaly(longitudeHour);
+        BigDecimal sunTrueLong = getSunTrueLongitude(meanAnomaly);
+
+
+        BigDecimal cosineSunLocalHour = getCosineSunLocalHour(sunTrueLong, solarZenith);
+        if ((cosineSunLocalHour.doubleValue() < -1.0) || (cosineSunLocalHour.doubleValue() > 1.0)) {
+            return null;
+        }
+
+        BigDecimal sunLocalHour = getSunLocalHour(cosineSunLocalHour, isSunrise);
+        BigDecimal localMeanTime = getLocalMeanTime(sunTrueLong, longitudeHour, sunLocalHour);
+
+        return getRemoteLocationTime(localMeanTime, date, remoteLocationUtcOffsetMinutes);
+    }
+
+
 
     /**
      * Computes the base longitude hour, lngHour in the algorithm.
@@ -262,6 +296,13 @@ public class SolarEventCalculator {
         return adjustForDST(utcOffSetTime, date);
     }
 
+    private BigDecimal getRemoteLocationTime (BigDecimal localMeanTime, Calendar date, int remoteLocationUtcOffsetMinutes) {
+        BigDecimal utcTime = localMeanTime.subtract(getBaseLongitudeHour());
+        BigDecimal utcOffSet = new BigDecimal(remoteLocationUtcOffsetMinutes/60);
+        BigDecimal utcOffSetTime = utcTime.add(utcOffSet);
+        return adjustForDST(utcOffSetTime, date);
+    }
+
     private BigDecimal adjustForDST(BigDecimal localMeanTime, Calendar date) {
         BigDecimal localTime = localMeanTime;
         if (timeZone.inDaylightTime(date.getTime())) {
@@ -274,13 +315,13 @@ public class SolarEventCalculator {
     }
 
     /**
-     * Returns the local rise/set time in the form HH:MM.
+     * Returns the rise/set time in the form HH:MM.
      *
      * @param localTimeParam
-     *            <code>BigDecimal</code> representation of the local rise/set time.
-     * @return <code>String</code> representation of the local rise/set time in HH:MM format.
+     *            <code>BigDecimal</code> representation of the rise/set time.
+     * @return <code>String</code> representation of the rise/set time in HH:MM format.
      */
-    private String getLocalTimeAsString(BigDecimal localTimeParam) {
+    private String getTimeAsString(BigDecimal localTimeParam) {
         if (localTimeParam == null) {
             return "99:99";
         }
@@ -308,6 +349,8 @@ public class SolarEventCalculator {
         String amPmString = (hour > 11) ? " pm" : " am";
         return hourString + ":" + minuteString + amPmString;
     }
+
+
 
     /**
      * Returns the local rise/set time in the form HH:MM.

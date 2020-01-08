@@ -52,7 +52,7 @@ public class SunriseSunsetCalculator {
      * @return the astronomical sunrise time in HH:MM (24-hour clock) form.
      */
     public String getAstronomicalSunriseForDate(Calendar date) {
-        return calculator.computeSunriseTime(Zenith.ASTRONOMICAL, date);
+        return calculator.computeSunriseTimeForPresentLocation(Zenith.ASTRONOMICAL, date);
     }
 
     /**
@@ -74,7 +74,7 @@ public class SunriseSunsetCalculator {
      * @return the astronomical sunset time in HH:MM (24-hour clock) form.
      */
     public String getAstronomicalSunsetForDate(Calendar date) {
-        return calculator.computeSunsetTime(Zenith.ASTRONOMICAL, date);
+        return calculator.computeSunsetTimeForPresentLocation(Zenith.ASTRONOMICAL, date);
     }
 
     /**
@@ -96,7 +96,7 @@ public class SunriseSunsetCalculator {
      * @return the nautical sunrise time in HH:MM (24-hour clock) form.
      */
     public String getNauticalSunriseForDate(Calendar date) {
-        return calculator.computeSunriseTime(Zenith.NAUTICAL, date);
+        return calculator.computeSunriseTimeForPresentLocation(Zenith.NAUTICAL, date);
     }
 
     /**
@@ -118,7 +118,7 @@ public class SunriseSunsetCalculator {
      * @return the nautical sunset time in HH:MM (24-hour clock) form.
      */
     public String getNauticalSunsetForDate(Calendar date) {
-        return calculator.computeSunsetTime(Zenith.NAUTICAL, date);
+        return calculator.computeSunsetTimeForPresentLocation(Zenith.NAUTICAL, date);
     }
 
     /**
@@ -140,7 +140,7 @@ public class SunriseSunsetCalculator {
      * @return the civil sunrise time in HH:MM (24-hour clock) form.
      */
     public String getCivilSunriseForDate(Calendar date) {
-        return calculator.computeSunriseTime(Zenith.CIVIL, date);
+        return calculator.computeSunriseTimeForPresentLocation(Zenith.CIVIL, date);
     }
 
     /**
@@ -162,7 +162,7 @@ public class SunriseSunsetCalculator {
      * @return the civil sunset time in HH:MM (24-hour clock) form.
      */
     public String getCivilSunsetForDate(Calendar date) {
-        return calculator.computeSunsetTime(Zenith.CIVIL, date);
+        return calculator.computeSunsetTimeForPresentLocation(Zenith.CIVIL, date);
     }
 
     /**
@@ -184,7 +184,13 @@ public class SunriseSunsetCalculator {
      * @return the official sunrise time in HH:MM (24-hour clock) form.
      */
     public String getOfficialSunriseForDate(Calendar date) {
-        return calculator.computeSunriseTime(Zenith.OFFICIAL, date);
+        return calculator.computeSunriseTimeForPresentLocation(Zenith.OFFICIAL, date);
+    }
+
+
+    //Returns the official sunrise for the given date at the given utcOffsetMinutes
+    public String getOfficialSunriseForDateAndUtcOffset(Calendar date, int utcOffsetMinutes) {
+        return calculator.computeSunriseTimeForRemoteLocation(Zenith.OFFICIAL, date, utcOffsetMinutes);
     }
 
     /**
@@ -206,7 +212,12 @@ public class SunriseSunsetCalculator {
      * @return the official sunset time in HH:MM (24-hour clock) form.
      */
     public String getOfficialSunsetForDate(Calendar date) {
-        return calculator.computeSunsetTime(Zenith.OFFICIAL, date);
+        return calculator.computeSunsetTimeForPresentLocation(Zenith.OFFICIAL, date);
+    }
+
+    //Returns the official sunset for the given date at the given utcOffsetMinutes
+    public String getOfficialSunsetForDateAndUtcOffset(Calendar date, int utcOffsetMinutes) {
+        return calculator.computeSunsetTimeForRemoteLocation(Zenith.OFFICIAL, date, utcOffsetMinutes);
     }
 
     /**
@@ -226,7 +237,7 @@ public class SunriseSunsetCalculator {
     }
 
     public String getCustomSunriseForDate(Calendar date, double degrees) {
-        return calculator.computeSunriseTime(new Zenith(degrees), date);
+        return calculator.computeSunriseTimeForPresentLocation(new Zenith(degrees), date);
     }
 
     public Calendar getCustomSunsetCalendarForDate(Calendar date, double degrees) {
@@ -234,7 +245,7 @@ public class SunriseSunsetCalculator {
     }
 
     public String getCustomSunsetForDate(Calendar date, double degrees) {
-        return calculator.computeSunsetTime(new Zenith(degrees), date);
+        return calculator.computeSunsetTimeForPresentLocation(new Zenith(degrees), date);
     }
 
     /**
