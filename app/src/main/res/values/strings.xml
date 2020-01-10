@@ -1,8 +1,10 @@
 <resources>
-    <string name="app_name">SunriseSunsetTimes</string>
+    <string name="app_name">Sunset and Sunrise Times</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="location_button">change</string>
+    <string name="today">Today</string>
     <string name="current_location">Current location</string>
+    <string name="city">City</string>
 </resources>

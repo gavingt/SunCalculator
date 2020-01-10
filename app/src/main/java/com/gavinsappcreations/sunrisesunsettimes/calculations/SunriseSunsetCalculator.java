@@ -2,6 +2,9 @@ package com.gavinsappcreations.sunrisesunsettimes.calculations;
 
 import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.model.Place;
+
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -41,6 +44,16 @@ public class SunriseSunsetCalculator {
      */
     public SunriseSunsetCalculator(Location location, TimeZone timeZone) {
         this.location = location;
+        this.calculator = new SolarEventCalculator(location, timeZone);
+    }
+
+
+    //Constructs a new SunriseSunsetCalculator with the given Place
+    public SunriseSunsetCalculator(Place place, TimeZone timeZone) {
+        LatLng latLng = place.getLatLng();
+        Location location = new Location("");
+        location.setLatitude(latLng.latitude);
+        location.setLongitude(latLng.longitude);
         this.calculator = new SolarEventCalculator(location, timeZone);
     }
 

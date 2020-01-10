@@ -6,8 +6,8 @@
 
     <data>
         <variable
-            name="viewModel"
-            type="com.gavinsappcreations.sunrisesunsettimes.home.HomeViewModel" />
+            name="sharedViewModel"
+            type="com.gavinsappcreations.sunrisesunsettimes.SharedViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_normal"
-            android:text="@{viewModel.sunriseTime}"
+            android:text="@{sharedViewModel.sunriseTime}"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintBottom_toTopOf="@+id/sunset_imageView"
             app:layout_constraintHorizontal_bias="0.5"
@@ -58,7 +58,7 @@
             android:id="@+id/sunset_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.sunsetTime}"
+            android:text="@{sharedViewModel.sunsetTime}"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
             app:layout_constraintHorizontal_bias="0.5"
@@ -79,7 +79,7 @@
             android:id="@+id/horizontal_bar"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/margin_small"
+            android:layout_marginBottom="@dimen/margin_normal"
             app:layout_constraintBottom_toTopOf="@id/location_imageView"
             android:background="@android:color/black" />
 
@@ -100,7 +100,7 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginLeft="@dimen/margin_small"
-            android:text="@{viewModel.place.name}"
+            android:text='@{sharedViewModel.place.name ?? @string/current_location}'
             tools:text="@string/current_location"
             app:layout_constraintTop_toTopOf="@id/location_imageView"
             app:layout_constraintBottom_toBottomOf="@id/location_imageView"
@@ -112,9 +112,9 @@
             android:alpha="0.6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/online_imageView"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginBottom="@dimen/margin_small"
+            android:layout_marginBottom="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_small"
             android:layout_marginLeft="@dimen/margin_normal"
             android:src="@drawable/baseline_today_black_24" />
@@ -125,34 +125,13 @@
             android:layout_height="0dp"
             android:layout_marginLeft="@dimen/margin_small"
             android:layout_weight="1"
-            android:text="Today"
+            tools:text="@string/today"
+            setDateText="@{sharedViewModel.dateInMillis}"
             app:layout_constraintTop_toTopOf="@id/date_imageView"
             app:layout_constraintBottom_toBottomOf="@id/date_imageView"
             app:layout_constraintLeft_toRightOf="@id/date_imageView"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
-        <ImageView
-            android:id="@+id/online_imageView"
-            android:alpha="0.6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginBottom="@dimen/margin_small"
-            android:layout_marginTop="@dimen/margin_small"
-            android:layout_marginLeft="@dimen/margin_normal"
-            android:src="@drawable/baseline_cloud_queue_black_24" />
-
-        <TextView
-            android:id="@+id/online_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginLeft="@dimen/margin_small"
-            android:text="Online"
-            app:layout_constraintTop_toTopOf="@id/online_imageView"
-            app:layout_constraintBottom_toBottomOf="@id/online_imageView"
-            app:layout_constraintLeft_toRightOf="@id/date_imageView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
         <Button
             android:id="@+id/options_button"
@@ -160,10 +139,10 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             app:layout_constraintTop_toTopOf="@id/location_imageView"
-            app:layout_constraintBottom_toBottomOf="@id/online_imageView"
+            app:layout_constraintBottom_toBottomOf="@id/date_imageView"
             app:layout_constraintRight_toRightOf="parent"
             android:textSize="16sp"
-            android:onClick="@{() -> viewModel.onOptionsButtonPressed()}"
+            android:onClick="@{() -> sharedViewModel.onOptionsButtonPressed()}"
             android:layout_marginRight="@dimen/margin_normal"
             android:text="@string/location_button"
             android:textColor="@color/colorAccent" />
