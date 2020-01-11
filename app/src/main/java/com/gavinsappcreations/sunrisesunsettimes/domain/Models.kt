@@ -19,3 +19,20 @@ data class TimeZoneData(
     val timeZoneId: String,
     val timeZoneName: String
 )
+
+
+/**
+ * SunData represents the sunrise/sunset data at the location and time specified in the request URL.
+ */
+data class SunData(
+    val sunrise: String,
+    val sunset: String,
+    val solar_noon: String,
+    val day_length: String,
+    val civil_twilight_begin: String,
+    val civil_twilight_end: String,
+    val nautical_twilight_begin: String,
+    val nautical_twilight_end: String,
+    val astronomical_twilight_begin: String,
+    val astronomical_twilight_end: String
+)

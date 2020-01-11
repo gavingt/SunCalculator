@@ -4,12 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gavinsappcreations.sunrisesunsettimes.calculations.SunriseSunsetCalculator
+import com.gavinsappcreations.sunrisesunsettimes.network.SunNetwork
 import com.gavinsappcreations.sunrisesunsettimes.network.TimeZoneNetwork
 import com.gavinsappcreations.sunrisesunsettimes.network.asDomainModel
 import com.google.android.libraries.places.api.model.Place
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.*
+
 
 class SharedViewModel : ViewModel() {
 
@@ -65,54 +67,6 @@ class SharedViewModel : ViewModel() {
         get() = _sunsetTime
 
 
-/*    private fun updateSunData() {
-        val place = _place.value
-        if (place == null || place.latLng == null || place.utcOffsetMinutes == null) {
-            return
-        }
-
-        viewModelScope.launch {
-            lateinit var timeZone: TimeZone
-
-            */
-    /**
-     * If using custom location, fetch time zone from Google's Time Zone Api.
-     * But if using current location, we can retrieve the time zone locally from the device.
-     *//*
-            if (_usingCustomLocation.value == true) {
-                withContext(Dispatchers.IO) {
-                    val networkTimeZoneData = TimeZoneNetwork.timeZone.getTimeZoneData().await()
-                    val timeZoneData = networkTimeZoneData.asDomainModel()
-                    timeZone = TimeZone.getTimeZone(timeZoneData.timeZoneId)
-                }
-            } else {
-                timeZone = TimeZone.getDefault()
-            }
-
-            viewModelScope.launch {
-                //TODO: handle online fetching of data here
-            }
-
-            val calculator = SunriseSunsetCalculator(place, timeZone)
-            val calendar = Calendar.getInstance()
-            val dateInMillis = _dateInMillis.value
-            if (dateInMillis != null) {
-                calendar.timeInMillis = dateInMillis
-            }
-            _sunriseTime.value = "Sunrise: ${calculator.getOfficialSunriseForDateAndUtcOffset(
-                calendar,
-                place.utcOffsetMinutes!!
-            )}"
-            _sunsetTime.value = "Sunset: ${calculator.getOfficialSunsetForDateAndUtcOffset(
-                calendar,
-                place.utcOffsetMinutes!!
-            )}"
-        }
-    }*/
-
-
-
-
     private fun updateSunData() {
         val place = _place.value
         if (place == null || place.latLng == null || place.utcOffsetMinutes == null) {
@@ -140,22 +94,56 @@ class SharedViewModel : ViewModel() {
                 .await().asDomainModel()
             val timeZoneFromApi = TimeZone.getTimeZone(timeZoneData.timeZoneId)
 
+            val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+            val formattedDateForApi = formatter.format(calendar.time)
 
-/*            viewModelScope.async {
-                //TODO: handle online fetching of sun data here
-            }*/
+            val sunData = SunNetwork.sunData.getSunData(
+                place.latLng!!.latitude,
+                place.latLng!!.longitude,
+                formattedDateForApi
+            ).await().results.asDomainModel()
 
-            val calculator = SunriseSunsetCalculator(place, TimeZone.getDefault())
+            /**
+             * The API result for sunset/sunrise times doesn't include the date, so we
+             * concatenate the date we used in the request earlier.
+             */
+            val sunriseApiDateString = formattedDateForApi + " " + sunData.sunrise
+            val sunsetApiDateString = formattedDateForApi + " " + sunData.sunset
 
-            _sunriseTime.value = "Sunrise: ${calculator.getOfficialSunriseForDateAndUtcOffset(
-                calendar,
-                place.utcOffsetMinutes!!
-            )}"
-            _sunsetTime.value = "Sunset: ${calculator.getOfficialSunsetForDateAndUtcOffset(
-                calendar,
-                place.utcOffsetMinutes!!
-            )}"
+            _sunriseTime.value =
+                "Sunrise: ${formatDateResultFromApi(sunriseApiDateString, timeZoneFromApi)}"
+            _sunsetTime.value =
+                "Sunset: ${formatDateResultFromApi(sunsetApiDateString, timeZoneFromApi)}"
         }
+    }
+
+
+    /**
+     * The date string returned by api.sunrise-sunset.org is in UTC, so we convert it to
+     * the correct time zone and format it the way we want it.
+     */
+    private fun formatDateResultFromApi(apiDateString: String, timeZone: TimeZone): String {
+
+        /**
+         * Parse the date string returned by the API into a Date object.
+         */
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss aa", Locale.ENGLISH)
+        val apiDate = simpleDateFormat.parse(apiDateString)
+
+        /**
+         * Use a calendar to turn the UTC time returned by the API into the current time for the
+         * location of interest. Do this by adding utcOffsetMinutes to apiDate
+         */
+        val calendar = Calendar.getInstance()
+        calendar.time = apiDate!!
+        calendar.add(Calendar.MILLISECOND, timeZone.getOffset(calendar.timeInMillis))
+        val correctedDate = calendar.time
+
+        /**
+         * Apply the time pattern we want to show in our app
+         */
+        simpleDateFormat.applyPattern("hh:mm aa")
+        return simpleDateFormat.format(correctedDate)
     }
 
 }

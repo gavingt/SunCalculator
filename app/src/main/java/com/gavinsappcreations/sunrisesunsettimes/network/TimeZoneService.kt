@@ -32,7 +32,7 @@ private val moshi = Moshi.Builder()
     .build()
 
 /**
- * Main entry point for network access. Call like `TimeZoneNetwork.timeZone.getDstOffset`
+ * Main entry point for network access. Call like `TimeZoneNetwork.timeZone.getTimeZoneData()`
  */
 object TimeZoneNetwork {
     // Configure retrofit to parse JSON and use coroutines
