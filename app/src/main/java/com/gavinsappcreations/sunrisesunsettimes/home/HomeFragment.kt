@@ -14,16 +14,9 @@ import com.gavinsappcreations.sunrisesunsettimes.options.OptionsBottomSheetFragm
 
 const val REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE = 1
 
-//TODO: change colors
-//TODO: If user denies permission, add Button in center of UI to bring up permission choice box again
-//TODO: make online work
-//TODO: make app work with rotation and process death
-//TODO: use TimeZone API to fix find UTC offset with DST https://developers.google.com/maps/documentation/timezone/start
-//TODO: add loading indicator (test by turning internet speed down in emulator)
-//TODO: must show attribution to sunset-sunrise.org with a link to site
-//TODO: app name is Sundial
-//TODO: what is the point of the suspend keyword when you alway have to use a coroutine context?
-//TODO: app icon
+//TODO: If user denies permission and closes BottomSheet, add Button in center of UI to bring up permission choice box again
+//TODO: implement custom bottomSheet to get rid of half-expanded entirely
+//TODO: add loading indicator (test by turning internet speed down in emulator) (use glimmer views or spinner?)
 //TODO: landscape mode
 
 class HomeFragment : Fragment() {

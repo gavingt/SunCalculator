@@ -1,13 +1,17 @@
 package com.gavinsappcreations.sunrisesunsettimes.options
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.Toast
 import androidx.annotation.Nullable
-import androidx.fragment.app.Fragment
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.PLACES_API_KEY
@@ -29,6 +33,7 @@ import java.util.*
 class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: OptionsBottomSheetLayoutBinding
+    private lateinit var autocompleteFragment: AutocompleteSupportFragment
 
     private val sharedViewModel: SharedViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java)
@@ -52,14 +57,21 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
 
         //When a change is made in the locationRadioGroup, save the new selection to viewModel
         binding.locationRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-            val usingCustomLocation = checkedId == R.id.custom_location_radioButton
-            sharedViewModel.onUsingCustomLocationChanged(usingCustomLocation)
+            val usingCustomLocationOldValue = sharedViewModel.usingCustomLocation.value
+            val usingCustomLocationNewValue = checkedId == R.id.custom_location_radioButton
+
+            //If usingCustomLocation value is unchanged, just return.
+            if (usingCustomLocationOldValue == usingCustomLocationNewValue) {
+                return@setOnCheckedChangeListener
+            }
+
+            sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue)
 
             /*
             * If using current location, set place equal to null as this will force
             * FusedLocationProvider to fetch user's current location.
             */
-            if (!usingCustomLocation && sharedViewModel.place.value != null) {
+            if (!usingCustomLocationNewValue) {
                 sharedViewModel.onPlaceChanged(null)
             }
         }
@@ -91,22 +103,47 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //force BottomSheet to start fully expanded
         view.viewTreeObserver.addOnGlobalLayoutListener {
+            //Force BottomSheet to start fully expanded and set peekHeight=0 so it never peeks
             val dialog = dialog as BottomSheetDialog?
             val bottomSheet: FrameLayout? =
                 dialog!!.findViewById(com.google.android.material.R.id.design_bottom_sheet)
             val behavior: BottomSheetBehavior<*> = BottomSheetBehavior.from(bottomSheet)
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
             behavior.skipCollapsed = true
+            behavior.peekHeight = 0
+
+            /**
+             * Fix some issues with the default behavior of AutocompleteFragment. Since we're
+             * inflating autocompleteFragment programmatically, we need to listen for its Views
+             * to be created before we can modify them.
+             */
+            autocompleteFragment.view?.viewTreeObserver?.addOnGlobalLayoutListener {
+                val clearButton =
+                    autocompleteFragment.view!!.findViewById<ImageButton>(R.id.places_autocomplete_clear_button)
+
+                //If user presses autocompleteFragment's clearButton, set place = null
+                clearButton.setOnClickListener {
+                    sharedViewModel.onPlaceChanged(null)
+                }
+
+                //hide cursor from autocompleteFragment's editText, as it also prevents pasting
+                val autocompleteEditText = autocompleteFragment.view!!
+                    .findViewById<EditText>(R.id.places_autocomplete_search_input)
+                autocompleteEditText.isCursorVisible = false
+            }
         }
 
-        //initialize the AutocompleteSupportFragment
-        val autocompleteFragment =
-            requireActivity().supportFragmentManager
-                .findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
 
-        //specify the types of place data to return
+        //Inflate the autocompleteFragment
+        val fm = childFragmentManager
+        val ft = fm.beginTransaction()
+        autocompleteFragment = AutocompleteSupportFragment()
+        ft.add(R.id.autocomplete_frameLayout, autocompleteFragment, "autocompleteFragment")
+        ft.commit()
+        fm.executePendingTransactions()
+
+        //Specify the types of place data to return
         autocompleteFragment.setPlaceFields(
             listOf(
                 Place.Field.NAME,
@@ -116,17 +153,17 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
         )
         autocompleteFragment.setTypeFilter(TypeFilter.CITIES)
         autocompleteFragment.setHint(getString(R.string.city))
-        val clearButton =
-            autocompleteFragment.view!!.findViewById<ImageButton>(R.id.places_autocomplete_clear_button)
-        //If user presses autocompleteFragment's clearButton, set place = null
-        clearButton.setOnClickListener {
-            sharedViewModel.onPlaceChanged(null)
-        }
 
-        //hide cursor from autocompleteFragment's editText, as it also prevents pasting
-        val editText = autocompleteFragment.view!!
-            .findViewById<EditText>(R.id.places_autocomplete_search_input)
-        editText.isCursorVisible = false
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onPlaceSelected(place: Place) {
+                sharedViewModel.onPlaceChanged(place)
+            }
+
+            override fun onError(status: Status) {
+                Log.i("LOG", "An error occurred: " + status);
+            }
+        })
 
         sharedViewModel.place.observe(this, Observer { place ->
             place?.let {
@@ -139,20 +176,14 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             }
         })
 
-        // Set up a PlaceSelectionListener to handle the response.
-        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-            override fun onPlaceSelected(place: Place) {
-                sharedViewModel.onPlaceChanged(place)
-            }
 
-            override fun onError(status: Status) {
-                Log.i("LOG", "An error occurred: " + status);
-            }
-        })
     }
 
-
+    //If no place has been selected, detect it here and revert to current location.
     override fun onDestroyView() {
+
+        super.onDestroyView()
+
         //Handle case when user selects "custom location" but doesn't enter a location.
         if (sharedViewModel.usingCustomLocation.value == true
             && sharedViewModel.place.value?.name == getString(R.string.current_location)
@@ -165,21 +196,13 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             ).show()
         }
 
-        /*
-        * We need to remove the autocompleteFragment here since it doesn't remove itself
-        * (as it wasn't created programmatically)
-        */
-        val fm = requireActivity().supportFragmentManager
-        val autocompleteFragment: Fragment = fm
-            .findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
-        fm.beginTransaction().remove(autocompleteFragment).commit()
-
         super.onDestroyView()
     }
 
     //Create BottomSheet
-    override fun onCreateDialog(savedInstanceState: Bundle?) =
-        BottomSheetDialog(requireContext(), theme)
+    override fun onCreateDialog(savedInstanceState: Bundle?): BottomSheetDialog {
+        return BottomSheetDialog(requireContext(), theme)
+    }
 
     //Set custom theme on BottomSheet
     override fun getTheme(): Int = R.style.BottomSheetTheme

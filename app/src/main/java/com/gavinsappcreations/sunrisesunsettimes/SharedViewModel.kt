@@ -20,13 +20,19 @@ class SharedViewModel : ViewModel() {
         get() = _place
 
     fun onPlaceChanged(place: Place?) {
-        _place.value = place
-        updateSunData()
+        if (_place.value != place) {
+            _place.value = place
+            updateSunData()
+        }
     }
 
     private val _usingCustomLocation = MutableLiveData<Boolean>()
     val usingCustomLocation: LiveData<Boolean>
         get() = _usingCustomLocation
+
+    init {
+        _usingCustomLocation.value = false
+    }
 
 
     fun onUsingCustomLocationChanged(usingCustomLocation: Boolean) {
@@ -132,7 +138,7 @@ class SharedViewModel : ViewModel() {
 
         /**
          * Use a calendar to turn the UTC time returned by the API into the current time for the
-         * location of interest. Do this by adding utcOffsetMinutes to apiDate
+         * location of interest. Do this by adding timeZone.getOffset to apiDate
          */
         val calendar = Calendar.getInstance()
         calendar.time = apiDate!!

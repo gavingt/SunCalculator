@@ -7,6 +7,7 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        title = "Sunrise and Sunset Times"
+        title = getString(R.string.app_name)
 
         //If place is null, we fetch the user's location.
         sharedViewModel.place.observe(this, Observer {
@@ -132,7 +133,14 @@ class MainActivity : AppCompatActivity() {
                 val utcOffsetMinutes = tz.getOffset(now.time) / MILLISECONDS_PER_MINUTE
                 placeBuilder.setUtcOffsetMinutes(utcOffsetMinutes)
 
-                sharedViewModel.onPlaceChanged(placeBuilder.build())
+                /**
+                 * Only update sharedViewModel.place based on current location if we haven't
+                 * done it yet. Otherwise we would be updating the place unconditionally every
+                 * time a configuration change occurs on the device.
+                 */
+                if (sharedViewModel.place.value == null) {
+                    sharedViewModel.onPlaceChanged(placeBuilder.build())
+                }
             }
 
         } else { // Permission was denied and user checked the "Don't ask again" checkbox.
