@@ -13,13 +13,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProviders
-import com.gavinsappcreations.sunrisesunsettimes.home.REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
 import java.util.*
 
 const val MILLISECONDS_PER_MINUTE = 60000
+const val REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE = 1
 const val PLACES_API_KEY = "AIzaSyCiNoSDVQtYBByS97Mou3v0k3o_1hR38qE"
 
 class MainActivity : AppCompatActivity() {

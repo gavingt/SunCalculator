@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.gavinsappcreations.sunrisesunsettimes.network.SunNetwork
 import com.gavinsappcreations.sunrisesunsettimes.network.TimeZoneNetwork
 import com.gavinsappcreations.sunrisesunsettimes.network.asDomainModel
+import com.gavinsappcreations.sunrisesunsettimes.utilities.formatDateResultFromApi
 import com.google.android.libraries.places.api.model.Place
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -25,6 +26,19 @@ class SharedViewModel : ViewModel() {
             updateSunData()
         }
     }
+
+    /**
+     * We use this value to fill in the progress in the ProgressBar. The values starts at 0,
+     * then is incremented to 1 and finally 2 to indicate the TimeZone data and sun data being fetched.
+     */
+    private val _loadingProgress = MutableLiveData<Int>()
+    val loadingProgress : LiveData<Int>
+        get() = _loadingProgress
+
+    init {
+        _loadingProgress.value = 0
+    }
+
 
     private val _usingCustomLocation = MutableLiveData<Boolean>()
     val usingCustomLocation: LiveData<Boolean>
@@ -86,19 +100,32 @@ class SharedViewModel : ViewModel() {
                 calendar.timeInMillis = _dateInMillis.value!!
             }
 
-            /**
-             * TimeZoneNetwork.timeZone.getTimeZoneData() is already returning a deferred thanks
-             * to Retrofit, so we don't need to call it from an async block. We just need to
-             * await() its result.
-             */
-            val timeZoneData = TimeZoneNetwork.timeZone
-                .getTimeZoneData(
-                    "${place.latLng!!.latitude},${place.latLng!!.longitude}",
-                    calendar.timeInMillis.shr(3),
-                    PLACES_API_KEY
-                )
-                .await().asDomainModel()
-            val timeZoneFromApi = TimeZone.getTimeZone(timeZoneData.timeZoneId)
+            //Reset loading progress
+            _loadingProgress.value = 0
+
+            //Initially set timeZoneId to the one returned by the user's device.
+            var timeZoneId = TimeZone.getDefault().id
+
+            //If we're using a custom location, overwrite timeZoneId with the result from the TimeZone API.
+            if (_usingCustomLocation.value == true) {
+                /**
+                 * TimeZoneNetwork.timeZone.getTimeZoneData() is already returning a deferred thanks
+                 * to Retrofit, so we don't need to call it from an async block. We just need to
+                 * await() its result.
+                 */
+                timeZoneId = TimeZoneNetwork.timeZone
+                    .getTimeZoneData(
+                        "${place.latLng!!.latitude},${place.latLng!!.longitude}",
+                        calendar.timeInMillis.shr(3),
+                        PLACES_API_KEY
+                    )
+                    .await().asDomainModel().timeZoneId
+            }
+
+            //Set loadingProgress value to 1 to indicate we've fetched the TimeZone.
+            _loadingProgress.value = 1
+
+            val timeZoneFromApi = TimeZone.getTimeZone(timeZoneId)
 
             val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
             val formattedDateForApi = formatter.format(calendar.time)
@@ -108,6 +135,9 @@ class SharedViewModel : ViewModel() {
                 place.latLng!!.longitude,
                 formattedDateForApi
             ).await().results.asDomainModel()
+
+            //Set loadingProgress value to 2 to indicate we've fetched the sun data.
+            _loadingProgress.value = 2
 
             /**
              * The API result for sunset/sunrise times doesn't include the date, so we
@@ -121,35 +151,6 @@ class SharedViewModel : ViewModel() {
             _sunsetTime.value =
                 "Sunset: ${formatDateResultFromApi(sunsetApiDateString, timeZoneFromApi)}"
         }
-    }
-
-
-    /**
-     * The date string returned by api.sunrise-sunset.org is in UTC, so we convert it to
-     * the correct time zone and format it the way we want it.
-     */
-    private fun formatDateResultFromApi(apiDateString: String, timeZone: TimeZone): String {
-
-        /**
-         * Parse the date string returned by the API into a Date object.
-         */
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss aa", Locale.ENGLISH)
-        val apiDate = simpleDateFormat.parse(apiDateString)
-
-        /**
-         * Use a calendar to turn the UTC time returned by the API into the current time for the
-         * location of interest. Do this by adding timeZone.getOffset to apiDate
-         */
-        val calendar = Calendar.getInstance()
-        calendar.time = apiDate!!
-        calendar.add(Calendar.MILLISECOND, timeZone.getOffset(calendar.timeInMillis))
-        val correctedDate = calendar.time
-
-        /**
-         * Apply the time pattern we want to show in our app
-         */
-        simpleDateFormat.applyPattern("hh:mm aa")
-        return simpleDateFormat.format(correctedDate)
     }
 
 }

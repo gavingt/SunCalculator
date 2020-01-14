@@ -12,10 +12,10 @@ import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
 import com.gavinsappcreations.sunrisesunsettimes.options.OptionsBottomSheetFragment
 
 
-const val REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE = 1
 
 //TODO: If user denies permission and closes BottomSheet, show floating snackbar or banner at top
-//TODO: add loading indicator (test by turning internet speed down in emulator) (use glimmer views or spinner?)
+//TODO: add error handling for network timeout (try with really bad internet). Show as floating snackbar with RETRY button
+//TODO: move calculations to separate project
 
 class HomeFragment : Fragment() {
 
@@ -43,6 +43,9 @@ class HomeFragment : Fragment() {
                 sharedViewModel.doneShowingOptionsBottomSheet()
             }
         })
+
+/*        val sunriseShimmerFrameLayout = binding.sunriseShimmerFrameLayout
+        sunriseShimmerFrameLayout.startShimmer()*/
 
         return binding.root
     }

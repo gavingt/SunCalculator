@@ -14,4 +14,5 @@
     <string name="drag_bottomsheet">Drag BottomSheet</string>
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
+    <string name="loading_sun_data">Loading sun data...</string>
 </resources>
