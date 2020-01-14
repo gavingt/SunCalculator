@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="BottomSheetTheme" parent="@style/Theme.Design.Light.BottomSheetDialog">>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+    <style name="AppTheme" parent="CommonTheme">
         <item name="android:navigationBarColor">@android:color/white</item>
         <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <style name="BottomSheetTheme" parent="@style/Theme.Design.Light.BottomSheetDialog">>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="bottomSheetStyle">@style/BottomSheet</item>
     </style>
 </resources>

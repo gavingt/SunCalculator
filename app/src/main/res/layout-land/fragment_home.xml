@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="sharedViewModel"
             type="com.gavinsappcreations.sunrisesunsettimes.SharedViewModel" />
@@ -19,14 +18,13 @@
             android:id="@+id/sunrise_imageView"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:src="@drawable/sunrise"
             android:contentDescription="@string/sunrise"
+            android:src="@drawable/sunrise"
             app:layout_constraintBottom_toTopOf="@+id/sunrise_textView"
-            app:layout_constraintHeight_percent="0.18"
+            app:layout_constraintEnd_toStartOf="@+id/sunset_imageView"
+            app:layout_constraintHeight_percent="0.25"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintTop_toBottomOf="@id/sunrise_textView"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
 
@@ -34,14 +32,14 @@
             android:id="@+id/sunrise_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_normal"
+            android:layout_marginTop="16dp"
             android:text="@{sharedViewModel.sunriseTime}"
-            android:textSize="30sp"
+            android:textSize="27sp"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            app:layout_constraintBottom_toTopOf="@+id/sunset_imageView"
+            app:layout_constraintBottom_toTopOf="@+id/top_bar_background"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/sunrise_imageView"
+            app:layout_constraintRight_toRightOf="@id/sunrise_imageView"
             app:layout_constraintTop_toBottomOf="@+id/sunrise_imageView"
             tools:text="Sunrise: 7:29am" />
 
@@ -49,28 +47,28 @@
             android:id="@+id/sunset_imageView"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginTop="@dimen/margin_extra_large"
             android:contentDescription="@string/sunset"
             android:src="@drawable/sunset"
             app:layout_constraintBottom_toTopOf="@+id/sunset_textView"
-            app:layout_constraintHeight_percent="0.18"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.25"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sunrise_textView" />
+            app:layout_constraintStart_toEndOf="@+id/sunrise_imageView"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
 
         <TextView
             android:id="@+id/sunset_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="@{sharedViewModel.sunsetTime}"
-            android:textSize="30sp"
-            android:layout_marginTop="@dimen/margin_normal"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
+            android:textSize="27sp"
+            app:layout_constraintBottom_toTopOf="@+id/top_bar_background"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/sunset_imageView"
+            app:layout_constraintRight_toRightOf="@id/sunset_imageView"
             app:layout_constraintTop_toBottomOf="@+id/sunset_imageView"
             tools:text="Sunset: 5:41pm" />
 
@@ -97,6 +95,7 @@
             android:layout_marginLeft="@dimen/margin_normal"
             android:layout_marginBottom="@dimen/margin_small"
             android:alpha="0.6"
+            android:contentDescription="@string/current_location"
             android:paddingBottom="@dimen/margin_extra_extra_small"
             android:src="@drawable/ic_map_marker_black_24dp"
             app:layout_constraintBottom_toTopOf="@id/date_imageView"
@@ -122,6 +121,7 @@
             android:layout_marginTop="@dimen/margin_small"
             android:layout_marginBottom="@dimen/margin_normal"
             android:alpha="0.6"
+            android:contentDescription="@string/date"
             android:src="@drawable/baseline_today_black_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent" />

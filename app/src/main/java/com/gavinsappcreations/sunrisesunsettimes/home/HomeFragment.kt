@@ -14,15 +14,11 @@ import com.gavinsappcreations.sunrisesunsettimes.options.OptionsBottomSheetFragm
 
 const val REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE = 1
 
-//TODO: If user denies permission and closes BottomSheet, add Button in center of UI to bring up permission choice box again
-//TODO: implement custom bottomSheet to get rid of half-expanded entirely
+//TODO: If user denies permission and closes BottomSheet, show floating snackbar or banner at top
 //TODO: add loading indicator (test by turning internet speed down in emulator) (use glimmer views or spinner?)
-//TODO: landscape mode
 
 class HomeFragment : Fragment() {
 
-    private lateinit var binding: FragmentHomeBinding
-    
     private val sharedViewModel: SharedViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java)
     }
@@ -33,7 +29,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        binding = FragmentHomeBinding.inflate(inflater)
+        val binding = FragmentHomeBinding.inflate(inflater)
 
         // Allows Data Binding to Observe LiveData with the lifecycle of this Fragment
         binding.lifecycleOwner = this
@@ -53,10 +49,16 @@ class HomeFragment : Fragment() {
 
     //This shows the OptionsBottomSheet that lets you change location, date, and toggle online/offline fetching.
     private fun showOptionsBottomSheet() {
-        OptionsBottomSheetFragment().show(
-            requireActivity().supportFragmentManager,
-            "options_fragment"
-        )
+        val fragment =
+            requireActivity().supportFragmentManager.findFragmentByTag("options_fragment")
+
+        //Prevent multiple BottomSheets from showing by null checking.
+        if (fragment == null) {
+            OptionsBottomSheetFragment().show(
+                requireActivity().supportFragmentManager,
+                "options_fragment"
+            )
+        }
     }
 
 }

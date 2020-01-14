@@ -17,10 +17,10 @@
         android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:paddingTop="@dimen/margin_normal"
-            android:paddingBottom="@dimen/margin_normal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/margin_small"
+            android:paddingBottom="@dimen/margin_small">
 
             <ImageView
                 android:id="@+id/drag_indicator"
@@ -39,25 +39,27 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:paddingTop="@dimen/margin_normal"
-                android:paddingBottom="@dimen/margin_extra_small"
+                android:paddingBottom="@dimen/margin_normal"
                 android:text="@string/options"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
-                android:textSize="23sp"
+                android:textSize="21sp"
                 app:layout_constraintTop_toBottomOf="@id/drag_indicator" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/autocomplete_cardView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
                 app:cardBackgroundColor="@android:color/white"
+                app:cardUseCompatPadding="true"
                 app:contentPadding="@dimen/margin_normal"
-                android:layout_margin="@dimen/margin_normal"
-                app:layout_constraintLeft_toLeftOf="@id/datePicker_cardView"
-                app:layout_constraintRight_toRightOf="@id/datePicker_cardView"
+                app:layout_constraintBottom_toBottomOf="@id/datePicker_cardView"
+                app:layout_constraintEnd_toStartOf="@+id/datePicker_cardView"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title_textView">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
@@ -67,16 +69,15 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="@dimen/margin_normal"
                         android:text="@string/location"
-                        android:textSize="18sp"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:textSize="18sp"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <RadioGroup
                         android:id="@+id/location_radioGroup"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
                         android:layout_marginRight="@dimen/margin_small"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/location_title_textView">
@@ -104,7 +105,7 @@
                     <FrameLayout
                         android:id="@+id/autocomplete_frameLayout"
                         autocompleteBackground="@{sharedViewModel.usingCustomLocation}"
-                        android:layout_width="match_parent"
+                        android:layout_width="250dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_normal"
                         android:background="@drawable/rounded_rectangle_enabled"
@@ -118,22 +119,19 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/datePicker_cardView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@android:color/white"
+                app:cardUseCompatPadding="true"
                 app:contentPadding="@dimen/margin_normal"
-                android:layout_marginTop="@dimen/margin_24dp"
-                android:layout_marginLeft="@dimen/margin_normal"
-                android:layout_marginRight="@dimen/margin_normal"
-                android:layout_marginBottom="@dimen/margin_normal"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/autocomplete_cardView">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/autocomplete_cardView"
+                app:layout_constraintTop_toTopOf="@id/autocomplete_cardView">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <TextView
@@ -141,19 +139,24 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/date"
-                        android:textSize="18sp"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:textSize="18sp"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <DatePicker
                         android:id="@+id/datePicker"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginLeft="-30dp"
                         android:layout_marginTop="-20dp"
-                        android:layout_marginBottom="-24dp"
+                        android:layout_marginRight="-34dp"
+                        android:layout_marginBottom="-40dp"
                         android:calendarViewShown="false"
-                        android:datePickerMode="spinner" />
+                        android:datePickerMode="spinner"
+                        android:scaleX="0.8"
+                        android:scaleY="0.8" />
 
                 </LinearLayout>
 

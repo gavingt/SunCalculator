@@ -32,7 +32,11 @@ import java.util.*
 //BottomSheetDialogFragment that uses a custom theme which sets a rounded background
 class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
 
-    private lateinit var binding: OptionsBottomSheetLayoutBinding
+    private var _binding: OptionsBottomSheetLayoutBinding? = null
+    // This property is only valid between onCreateView and onDestroyView.
+    private val binding
+        get() = _binding!!
+
     private lateinit var autocompleteFragment: AutocompleteSupportFragment
 
     private val sharedViewModel: SharedViewModel by lazy {
@@ -46,7 +50,7 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
         @Nullable savedInstanceState: Bundle?
     ): View? {
 
-        binding = OptionsBottomSheetLayoutBinding.inflate(inflater)
+        _binding = OptionsBottomSheetLayoutBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.sharedViewModel = sharedViewModel
 
@@ -183,6 +187,12 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onDestroyView() {
 
         super.onDestroyView()
+
+        /**
+         * Since Fragments outlive their Views, we need to clean up references to the binding
+         * class instance when we close the Fragment
+         */
+        _binding = null
 
         //Handle case when user selects "custom location" but doesn't enter a location.
         if (sharedViewModel.usingCustomLocation.value == true
