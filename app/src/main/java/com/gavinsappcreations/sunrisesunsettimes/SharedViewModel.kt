@@ -1,5 +1,6 @@
 package com.gavinsappcreations.sunrisesunsettimes
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,9 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.gavinsappcreations.sunrisesunsettimes.network.SunNetwork
 import com.gavinsappcreations.sunrisesunsettimes.network.TimeZoneNetwork
 import com.gavinsappcreations.sunrisesunsettimes.network.asDomainModel
+import com.gavinsappcreations.sunrisesunsettimes.utilities.PLACES_API_KEY
 import com.gavinsappcreations.sunrisesunsettimes.utilities.formatDateResultFromApi
 import com.google.android.libraries.places.api.model.Place
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,6 +28,7 @@ class SharedViewModel : ViewModel() {
             updateSunData()
         }
     }
+
 
     /**
      * We use this value to fill in the progress in the ProgressBar. The values starts at 0,
@@ -93,15 +96,16 @@ class SharedViewModel : ViewModel() {
             return
         }
 
-        viewModelScope.launch {
+        //Reset loading progress
+        _loadingProgress.value = 0
+        Log.d("LOG", "0")
+
+        viewModelScope.launch(Dispatchers.IO) {
 
             val calendar = Calendar.getInstance()
             if (_dateInMillis.value != null) {
                 calendar.timeInMillis = _dateInMillis.value!!
             }
-
-            //Reset loading progress
-            _loadingProgress.value = 0
 
             //Initially set timeZoneId to the one returned by the user's device.
             var timeZoneId = TimeZone.getDefault().id
@@ -123,7 +127,7 @@ class SharedViewModel : ViewModel() {
             }
 
             //Set loadingProgress value to 1 to indicate we've fetched the TimeZone.
-            _loadingProgress.value = 1
+            _loadingProgress.postValue(1)
 
             val timeZoneFromApi = TimeZone.getTimeZone(timeZoneId)
 
@@ -137,7 +141,7 @@ class SharedViewModel : ViewModel() {
             ).await().results.asDomainModel()
 
             //Set loadingProgress value to 2 to indicate we've fetched the sun data.
-            _loadingProgress.value = 2
+            _loadingProgress.postValue(2)
 
             /**
              * The API result for sunset/sunrise times doesn't include the date, so we
@@ -146,10 +150,10 @@ class SharedViewModel : ViewModel() {
             val sunriseApiDateString = formattedDateForApi + " " + sunData.sunrise
             val sunsetApiDateString = formattedDateForApi + " " + sunData.sunset
 
-            _sunriseTime.value =
-                "Sunrise: ${formatDateResultFromApi(sunriseApiDateString, timeZoneFromApi)}"
-            _sunsetTime.value =
-                "Sunset: ${formatDateResultFromApi(sunsetApiDateString, timeZoneFromApi)}"
+            _sunriseTime.postValue(
+                "Sunrise: ${formatDateResultFromApi(sunriseApiDateString, timeZoneFromApi)}")
+            _sunsetTime.postValue(
+                "Sunset: ${formatDateResultFromApi(sunsetApiDateString, timeZoneFromApi)}")
         }
     }
 

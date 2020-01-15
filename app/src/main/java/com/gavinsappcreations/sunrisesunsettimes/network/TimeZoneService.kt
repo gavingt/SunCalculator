@@ -1,6 +1,5 @@
 package com.gavinsappcreations.sunrisesunsettimes.network
 
-import com.gavinsappcreations.sunrisesunsettimes.PLACES_API_KEY
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

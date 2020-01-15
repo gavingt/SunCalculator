@@ -1,6 +1,7 @@
 package com.gavinsappcreations.sunrisesunsettimes.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +12,9 @@ import com.gavinsappcreations.sunrisesunsettimes.SharedViewModel
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
 import com.gavinsappcreations.sunrisesunsettimes.options.OptionsBottomSheetFragment
 
-
-
 //TODO: If user denies permission and closes BottomSheet, show floating snackbar or banner at top
-//TODO: add error handling for network timeout (try with really bad internet). Show as floating snackbar with RETRY button
+//TODO: add error handling for network timeout (try with really bad internet). Show as floating snackbar with RETRY button.
+       //do we handle this as try-catches in the coroutines?
 //TODO: move calculations to separate project
 
 class HomeFragment : Fragment() {
@@ -43,9 +43,6 @@ class HomeFragment : Fragment() {
                 sharedViewModel.doneShowingOptionsBottomSheet()
             }
         })
-
-/*        val sunriseShimmerFrameLayout = binding.sunriseShimmerFrameLayout
-        sunriseShimmerFrameLayout.startShimmer()*/
 
         return binding.root
     }

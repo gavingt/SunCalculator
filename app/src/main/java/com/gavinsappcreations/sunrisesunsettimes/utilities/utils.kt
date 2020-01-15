@@ -1,5 +1,6 @@
 package com.gavinsappcreations.sunrisesunsettimes.utilities
 
+import android.os.Handler
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,4 +32,19 @@ fun formatDateResultFromApi(apiDateString: String, timeZone: TimeZone): String {
      */
     simpleDateFormat.applyPattern("hh:mm aa")
     return simpleDateFormat.format(correctedDate)
+}
+
+
+/**
+ * Wait DATE_PICKER_SETTLE_TIME and if timeDateChangedInMillis doesn't change,
+ * call the lambda runAfterSettling().
+ */
+fun waitForDatePickerToSettle(handler: Handler, oldTimeDateChangedInMillis: Long, runAfterSettling: () -> Unit) {
+    handler.removeCallbacksAndMessages(null)
+    val runnable = Runnable {
+        if (System.currentTimeMillis() - oldTimeDateChangedInMillis > DATE_PICKER_SETTLE_TIME) {
+            runAfterSettling()
+        }
+    }
+    handler.postDelayed(runnable, DATE_PICKER_SETTLE_TIME)
 }

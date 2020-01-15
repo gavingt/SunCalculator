@@ -1,7 +1,7 @@
 package com.gavinsappcreations.sunrisesunsettimes.options
 
-import android.content.DialogInterface
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,13 +11,14 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.annotation.Nullable
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.gavinsappcreations.sunrisesunsettimes.PLACES_API_KEY
 import com.gavinsappcreations.sunrisesunsettimes.R
 import com.gavinsappcreations.sunrisesunsettimes.SharedViewModel
 import com.gavinsappcreations.sunrisesunsettimes.databinding.OptionsBottomSheetLayoutBinding
+import com.gavinsappcreations.sunrisesunsettimes.utilities.DATE_PICKER_SETTLE_TIME
+import com.gavinsappcreations.sunrisesunsettimes.utilities.PLACES_API_KEY
+import com.gavinsappcreations.sunrisesunsettimes.utilities.waitForDatePickerToSettle
 import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -37,11 +38,21 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
     private val binding
         get() = _binding!!
 
-    private lateinit var autocompleteFragment: AutocompleteSupportFragment
-
     private val sharedViewModel: SharedViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java)
     }
+
+    private lateinit var autocompleteFragment: AutocompleteSupportFragment
+
+    /**
+     * This keeps track of the last time the OnDateChangedListener was called. This enables us
+     * to wait for the DatePicker spinner to settle, which eliminates unnecessary API calls.
+     */
+    private var timeDateChangedInMillis = System.currentTimeMillis()
+
+    val handler = Handler()
+
+
 
     @Nullable
     override fun onCreateView(
@@ -93,11 +104,14 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ) { _, year, monthOfYear, dayOfMonth ->
-            calendar.set(Calendar.YEAR, year)
-            calendar.set(Calendar.MONTH, monthOfYear)
-            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-            sharedViewModel.onDateChanged(calendar.timeInMillis)
+            //Call code in lambda only after DatePicker has settled
+            waitForDatePickerToSettle (handler, timeDateChangedInMillis) {
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, monthOfYear)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                sharedViewModel.onDateChanged(calendar.timeInMillis)
+            }
+            timeDateChangedInMillis = System.currentTimeMillis()
         }
 
         return binding.root

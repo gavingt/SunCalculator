@@ -2,6 +2,7 @@ package com.gavinsappcreations.sunrisesunsettimes.utilities
 
 import android.animation.ObjectAnimator
 import android.text.format.DateUtils
+import android.util.Log
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.*
@@ -70,7 +71,7 @@ fun View.setSunViewVisibility(loadingProgress: Int) {
 @BindingAdapter("updateProgressBarProgress")
 fun ContentLoadingProgressBar.updateProgressBarProgress(loadingProgress: Int) {
 
-    if (loadingProgress == 0) {
+    if (loadingProgress == 0 || loadingProgress == 1) {
         show()
     }
 

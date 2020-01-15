@@ -16,13 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/group"
-            setSunViewVisibility="@{sharedViewModel.loadingProgress}"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:constraint_referenced_ids="sunrise_imageView,sunrise_textView,sunset_imageView,sunset_textView" />
-
         <TextView
             android:id="@+id/loading_textView"
             android:layout_width="wrap_content"
@@ -54,6 +47,9 @@
             android:layout_height="0dp"
             android:contentDescription="@string/sunrise"
             android:src="@drawable/sunrise"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            setSunViewVisibility="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@+id/sunrise_textView"
             app:layout_constraintHeight_percent="0.18"
             app:layout_constraintHorizontal_bias="0.5"
@@ -71,6 +67,9 @@
             android:text="@{sharedViewModel.sunriseTime}"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="30sp"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            setSunViewVisibility="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@+id/sunset_imageView"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -85,6 +84,9 @@
             android:layout_marginTop="@dimen/margin_extra_large"
             android:contentDescription="@string/sunset"
             android:src="@drawable/sunset"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            setSunViewVisibility="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@+id/sunset_textView"
             app:layout_constraintHeight_percent="0.18"
             app:layout_constraintHorizontal_bias="0.5"
@@ -100,6 +102,9 @@
             android:text="@{sharedViewModel.sunsetTime}"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="30sp"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            setSunViewVisibility="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
