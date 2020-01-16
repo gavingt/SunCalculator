@@ -1,6 +1,5 @@
 package com.gavinsappcreations.sunrisesunsettimes
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -34,12 +33,12 @@ class SharedViewModel : ViewModel() {
      * We use this value to fill in the progress in the ProgressBar. The values starts at 0,
      * then is incremented to 1 and finally 2 to indicate the TimeZone data and sun data being fetched.
      */
-    private val _loadingProgress = MutableLiveData<Int>()
-    val loadingProgress : LiveData<Int>
-        get() = _loadingProgress
+    private val _loadingInProgress = MutableLiveData<Boolean>()
+    val loadingInProgress : LiveData<Boolean>
+        get() = _loadingInProgress
 
     init {
-        _loadingProgress.value = 0
+        _loadingInProgress.value = true
     }
 
 
@@ -70,7 +69,7 @@ class SharedViewModel : ViewModel() {
         _showOptionsBottomSheetEvent.value = false
     }
 
-
+    //The date the user selects to show sun data for.
     private val _dateInMillis = MutableLiveData<Long?>()
     val dateInMillis: LiveData<Long?>
         get() = _dateInMillis
@@ -78,6 +77,18 @@ class SharedViewModel : ViewModel() {
     fun onDateChanged(newDateInMillis: Long?) {
         _dateInMillis.value = newDateInMillis
         updateSunData()
+    }
+
+    /**
+     * This indicates if the datePicker spinner is currently settling. We use this to determine
+     * when we should show the ProgressBar and hide the views displaying sun data.
+     */
+    private val _datePickerSettling = MutableLiveData<Boolean>()
+    val datePickerSettling: LiveData<Boolean>
+        get() = _datePickerSettling
+
+    fun onDatePickerSettlingChanged(datePickerSettling: Boolean) {
+        _datePickerSettling.value = datePickerSettling
     }
 
 
@@ -91,14 +102,13 @@ class SharedViewModel : ViewModel() {
 
 
     private fun updateSunData() {
+
+        _loadingInProgress.value = true
+
         val place = _place.value
         if (place == null || place.latLng == null || place.utcOffsetMinutes == null) {
             return
         }
-
-        //Reset loading progress
-        _loadingProgress.value = 0
-        Log.d("LOG", "0")
 
         viewModelScope.launch(Dispatchers.IO) {
 
@@ -126,9 +136,6 @@ class SharedViewModel : ViewModel() {
                     .await().asDomainModel().timeZoneId
             }
 
-            //Set loadingProgress value to 1 to indicate we've fetched the TimeZone.
-            _loadingProgress.postValue(1)
-
             val timeZoneFromApi = TimeZone.getTimeZone(timeZoneId)
 
             val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
@@ -140,8 +147,6 @@ class SharedViewModel : ViewModel() {
                 formattedDateForApi
             ).await().results.asDomainModel()
 
-            //Set loadingProgress value to 2 to indicate we've fetched the sun data.
-            _loadingProgress.postValue(2)
 
             /**
              * The API result for sunset/sunrise times doesn't include the date, so we
@@ -154,7 +159,11 @@ class SharedViewModel : ViewModel() {
                 "Sunrise: ${formatDateResultFromApi(sunriseApiDateString, timeZoneFromApi)}")
             _sunsetTime.postValue(
                 "Sunset: ${formatDateResultFromApi(sunsetApiDateString, timeZoneFromApi)}")
+
+            _loadingInProgress.postValue(false)
+
         }
+
     }
 
 }

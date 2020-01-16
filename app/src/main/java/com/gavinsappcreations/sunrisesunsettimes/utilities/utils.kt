@@ -35,14 +35,15 @@ fun formatDateResultFromApi(apiDateString: String, timeZone: TimeZone): String {
 }
 
 
+
 /**
  * Wait DATE_PICKER_SETTLE_TIME and if timeDateChangedInMillis doesn't change,
  * call the lambda runAfterSettling().
  */
-fun waitForDatePickerToSettle(handler: Handler, oldTimeDateChangedInMillis: Long, runAfterSettling: () -> Unit) {
+fun waitForDatePickerToSettle(handler: Handler, timeDateChangedInMillis: Long, runAfterSettling: () -> Unit) {
     handler.removeCallbacksAndMessages(null)
     val runnable = Runnable {
-        if (System.currentTimeMillis() - oldTimeDateChangedInMillis > DATE_PICKER_SETTLE_TIME) {
+        if (System.currentTimeMillis() - timeDateChangedInMillis > DATE_PICKER_SETTLE_TIME) {
             runAfterSettling()
         }
     }

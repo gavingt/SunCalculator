@@ -10,3 +10,6 @@ const val PLACES_API_KEY = "AIzaSyCiNoSDVQtYBByS97Mou3v0k3o_1hR38qE"
  * spinning the DatePicker to reach a certain date.
  */
 const val DATE_PICKER_SETTLE_TIME: Long = 350
+
+//This is the amount of time in ms that it takes to animate each chunk of the loading bar.
+const val LOADING_PROGRESS_ANIMATION_TIME: Long = 350

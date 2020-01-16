@@ -15,6 +15,7 @@ import com.gavinsappcreations.sunrisesunsettimes.options.OptionsBottomSheetFragm
 //TODO: If user denies permission and closes BottomSheet, show floating snackbar or banner at top
 //TODO: add error handling for network timeout (try with really bad internet). Show as floating snackbar with RETRY button.
        //do we handle this as try-catches in the coroutines?
+//TODO: sun data sometimes doesn't show up with bad internet
 //TODO: move calculations to separate project
 
 class HomeFragment : Fragment() {

@@ -1,6 +1,7 @@
 package com.gavinsappcreations.sunrisesunsettimes.utilities
 
 import android.animation.ObjectAnimator
+import android.app.ProgressDialog.show
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.View
@@ -14,7 +15,6 @@ import androidx.databinding.BindingAdapter
 import java.text.SimpleDateFormat
 import java.util.*
 
-const val LOADING_PROGRESS_ANIMATION_TIME: Long = 350  //350 ms
 
 //Sets the background and enables/disables the various parts of the autocomplete Fragment
 @BindingAdapter("autocompleteBackground")
@@ -52,15 +52,23 @@ fun TextView.setDateText(timeInMillis: Long?) {
 
 
 //Controls the visibility of views in HomeFragment while loading is occurring.
-@BindingAdapter("setSunViewVisibility")
-fun View.setSunViewVisibility(loadingProgress: Int) {
-    when (loadingProgress) {
-        0, 1 -> visibility = View.INVISIBLE
-        else -> {
-            postDelayed({
-                visibility = View.VISIBLE
-            }, LOADING_PROGRESS_ANIMATION_TIME)
-        }
+@BindingAdapter("loadingInProgress", "datePickerSettling")
+fun View.setSunViewVisibility(loadingInProgress: Boolean, datePickerSettling: Boolean) {
+    visibility = if (datePickerSettling || loadingInProgress) {
+        View.INVISIBLE
+    } else {
+        View.VISIBLE
+    }
+}
+
+
+//Controls the visibility of the ProgressBar and its accompanying TextView.
+@BindingAdapter("setProgressBarVisibility")
+fun ContentLoadingProgressBar.setProgressBarVisibility(loadingInProgress: Boolean) {
+    if (loadingInProgress) {
+        show()
+    } else {
+        hide()
     }
 }
 
@@ -68,35 +76,32 @@ fun View.setSunViewVisibility(loadingProgress: Int) {
  * Update the ProgressBar progress with a smooth animation. We multiply the loadingProgress
  * by 50 so that the ProgressBar actually has some values to animate over.
  */
-@BindingAdapter("updateProgressBarProgress")
-fun ContentLoadingProgressBar.updateProgressBarProgress(loadingProgress: Int) {
+/*@BindingAdapter("updateProgressBarProgress")
+fun ProgressBar.updateProgressBarProgress(loadingProgress: Int) {
 
-    if (loadingProgress == 0 || loadingProgress == 1) {
-        show()
+    if (loadingProgress == 0) {
+        visibility = View.VISIBLE
+        return
     }
 
-    val animation = ObjectAnimator.ofInt(this, "progress", loadingProgress * 50)
+    if (loadingProgress == 1) {
+        visibility = View.VISIBLE
+    }
+
+    val progressStart = (loadingProgress - 1) * 50
+    val progressEnd = loadingProgress * 50
+
+    progress = progressStart
+
+
+    val animation = ObjectAnimator.ofInt(this, "progress", progressStart, progressEnd)
     animation.duration = LOADING_PROGRESS_ANIMATION_TIME
     animation.interpolator = DecelerateInterpolator()
     animation.start()
     //Wait until animation ends to hide ProgressBar
     animation.doOnEnd {
-        if (loadingProgress == 2) {
-            hide()
+        if (progressEnd == 100) {
+            visibility = View.INVISIBLE
         }
     }
-}
-
-
-//Controls the visibility of the TextView that's above the ProgressBar.
-@BindingAdapter("setLoadingTextVisibility")
-fun TextView.setLoadingTextVisibility(loadingProgress: Int) {
-    when (loadingProgress) {
-        0, 1 -> visibility = View.VISIBLE
-        2 -> {
-            postDelayed({
-                visibility = View.INVISIBLE
-            }, LOADING_PROGRESS_ANIMATION_TIME)
-        }
-    }
-}
+}*/

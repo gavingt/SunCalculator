@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.R
 import com.gavinsappcreations.sunrisesunsettimes.SharedViewModel
 import com.gavinsappcreations.sunrisesunsettimes.databinding.OptionsBottomSheetLayoutBinding
-import com.gavinsappcreations.sunrisesunsettimes.utilities.DATE_PICKER_SETTLE_TIME
 import com.gavinsappcreations.sunrisesunsettimes.utilities.PLACES_API_KEY
 import com.gavinsappcreations.sunrisesunsettimes.utilities.waitForDatePickerToSettle
 import com.google.android.gms.common.api.Status
@@ -50,8 +49,8 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
      */
     private var timeDateChangedInMillis = System.currentTimeMillis()
 
-    val handler = Handler()
-
+    //We need a single Handler so we can remove old callbacks while waiting for the DatePicker to settle.
+    private val dateChangedHandler = Handler()
 
 
     @Nullable
@@ -104,14 +103,16 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ) { _, year, monthOfYear, dayOfMonth ->
+            timeDateChangedInMillis = System.currentTimeMillis()
+            sharedViewModel.onDatePickerSettlingChanged(true)
             //Call code in lambda only after DatePicker has settled
-            waitForDatePickerToSettle (handler, timeDateChangedInMillis) {
+            waitForDatePickerToSettle (dateChangedHandler, timeDateChangedInMillis) {
                 calendar.set(Calendar.YEAR, year)
                 calendar.set(Calendar.MONTH, monthOfYear)
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 sharedViewModel.onDateChanged(calendar.timeInMillis)
+                sharedViewModel.onDatePickerSettlingChanged(false)
             }
-            timeDateChangedInMillis = System.currentTimeMillis()
         }
 
         return binding.root
