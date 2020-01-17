@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Sun Calculator</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="location_button">change</string>
+    <string name="today">Today</string>
+    <string name="current_location">Current location</string>
+    <string name="city">City</string>
+    <string name="use_current_location">Use current location</string>
+    <string name="date">Date</string>
+    <string name="location">Location</string>
+    <string name="options">Options</string>
+    <string name="drag_bottomsheet">Drag BottomSheet</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="loading_sun_data">Loading sun data…</string>
+    <string name="no_connection">No connection</string>
+    <string name="retry">Retry</string>
+    <string name="use_custom_location">Use custom location</string>
+    <string name="missing_permission">Missing permission</string>
+
+</resources>
