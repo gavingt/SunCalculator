@@ -137,21 +137,6 @@ fun TextInputEditText.setBottomSheetCityText(place: Place?) {
 //Sets text in HomeFragment's locationTextView based on the value of place.name.
 @BindingAdapter("homeFragmentCityName", "locationPermissionGranted")
 fun TextView.setHomeFragmentCityText(place: Place?, locationPermissionGranted: Boolean?) {
-/*    if (locationPermissionGranted != true) {
-        text = context.getString(R.string.missing_permission)
-        setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-        setTypeface(null, Typeface.BOLD)
-
-    } else if (place == null || place.name == context.getString(R.string.current_location)) {
-        text = context.getString(R.string.current_location)
-        setTextColor(ContextCompat.getColor(context, R.color.colorText))
-        setTypeface(null, Typeface.NORMAL)
-    } else {
-        text = place.name
-        setTextColor(ContextCompat.getColor(context, R.color.colorText))
-        setTypeface(null, Typeface.NORMAL)
-    }*/
-
     if (place != null && place.name != context.getString(R.string.current_location)) {
         text = place.name
         setTextColor(ContextCompat.getColor(context, R.color.colorText))
@@ -167,21 +152,4 @@ fun TextView.setHomeFragmentCityText(place: Place?, locationPermissionGranted: B
             setTypeface(null, Typeface.BOLD)
         }
     }
-
-
-/*    if (locationPermissionGranted != true) {
-        text = context.getString(R.string.missing_permission)
-        setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-        setTypeface(null, Typeface.BOLD)
-
-    } else if (place == null || place.name == context.getString(R.string.current_location)) {
-        text = context.getString(R.string.current_location)
-        setTextColor(ContextCompat.getColor(context, R.color.colorText))
-        setTypeface(null, Typeface.NORMAL)
-    } else {
-        text = place.name
-        setTextColor(ContextCompat.getColor(context, R.color.colorText))
-        setTypeface(null, Typeface.NORMAL)
-    }*/
-
 }
