@@ -46,6 +46,13 @@ class MainActivity : AppCompatActivity() {
         })
 
         requestLocationPermission()
+
+        sharedViewModel.triggerRequestLocationPermissionEvent.observe(this, Observer {
+            if (it == true) {
+                requestLocationPermission()
+                sharedViewModel.doneRequestingLocationPermission()
+            }
+        })
     }
 
     private fun requestLocationPermission() {
@@ -97,9 +104,8 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-        builder.setNegativeButton("Choose location manually") { dialog, id ->
-            sharedViewModel.onUsingCustomLocationChanged(usingCustomLocation = true)
-            sharedViewModel.showOptionsBottomSheet()
+        builder.setNegativeButton(getString(R.string.use_custom_location)) { _, _ ->
+            sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue = true)
             alertDialog?.dismiss()
         }
         builder.setTitle("App needs a location")
@@ -122,6 +128,15 @@ class MainActivity : AppCompatActivity() {
         }
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // Permission was granted.
+            sharedViewModel.onLocationPermissionGrantedStateChanged(true)
+
+            /**
+             * Permission will only be requested when using current location, so we can set this
+             * value here. This is only needed in case the user initially denied the permission,
+             * then granted it from the BottomSheet.
+             */
+            sharedViewModel.onUsingCustomLocationChanged(false)
+
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 // Got last known location. In some rare situations this can be null.
@@ -143,9 +158,12 @@ class MainActivity : AppCompatActivity() {
                 if (sharedViewModel.place.value == null) {
                     sharedViewModel.onPlaceChanged(placeBuilder.build())
                 }
+
+
             }
 
         } else { // Permission was denied and user checked the "Don't ask again" checkbox.
+            sharedViewModel.onLocationPermissionGrantedStateChanged(null)
             showUserDeniedPermissionsAlertDialog(true)
         }
     }

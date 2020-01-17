@@ -30,9 +30,10 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
 
     //This will be true if a network error occurred and the user has yet to retry the request.
-    private val _errorOccurred = MutableLiveData<Boolean?>()
-    val errorOccurred: LiveData<Boolean?>
-        get() = _errorOccurred
+    private val _inErrorState = MutableLiveData<Boolean?>()
+    val inErrorState: LiveData<Boolean?>
+        get() = _inErrorState
+
 
 
     //Event that determines when optionsBottomSheet should be shown.
@@ -64,6 +65,31 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     }
 
 
+
+    private val _locationPermissionGrantedState = MutableLiveData<Boolean?>()
+    val locationPermissionGrantedState: LiveData<Boolean?>
+        get() = _locationPermissionGrantedState
+
+    fun onLocationPermissionGrantedStateChanged(locationPermissionGranted: Boolean?) {
+        _locationPermissionGrantedState.value = locationPermissionGranted
+    }
+
+    private val _triggerRequestLocationPermissionEvent = MutableLiveData<Boolean>()
+    val triggerRequestLocationPermissionEvent: LiveData<Boolean>
+        get() = _triggerRequestLocationPermissionEvent
+
+    //This is called from OptionsBottomSheetFragment when it needs to request the Location permission.
+    fun requestLocationPermission() {
+        _triggerRequestLocationPermissionEvent.value = true
+    }
+
+    //This is called from MainActivity after the Location permission is done being requested.
+    fun doneRequestingLocationPermission() {
+        _triggerOptionsBottomSheetEvent.value = false
+    }
+
+
+
     /**
      * We need a second variable to signal to ProgressBar when loading is occurring, since
      * the loadingProgress is updated so rapidly in some circumstances that all its values aren't
@@ -75,6 +101,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         get() = _fetchingSunData
 
 
+
     private val _usingCustomLocation = MutableLiveData<Boolean>()
     val usingCustomLocation: LiveData<Boolean>
         get() = _usingCustomLocation
@@ -83,8 +110,10 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         _usingCustomLocation.value = false
     }
 
-    fun onUsingCustomLocationChanged(usingCustomLocation: Boolean) {
-        _usingCustomLocation.value = usingCustomLocation
+    fun onUsingCustomLocationChanged(usingCustomLocationNewValue: Boolean) {
+        if (_usingCustomLocation.value != usingCustomLocationNewValue) {
+            _usingCustomLocation.value = usingCustomLocationNewValue
+        }
     }
 
 
@@ -112,9 +141,9 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
         if (isNetworkAvailable(getApplication())) {
             //Reset errorOccurred.value since we're starting/restarting the network requests.
-            _errorOccurred.value = null
+            _inErrorState.value = null
         } else {
-            _errorOccurred.value = true
+            _inErrorState.value = true
             return
         }
 
@@ -192,7 +221,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
             } catch (e: Exception) {
                 Log.d("LOG", "Error: ${e.message ?: "No message"}")
                 //Set errorOccurred.value to true so the UI can display an error message.
-                _errorOccurred.postValue(true)
+                _inErrorState.postValue(true)
                 //Set fetchingSunData.value to null to indicate that fetching is complete.
                 _fetchingSunData.value = null
             }

@@ -71,8 +71,9 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             PLACES_API_KEY
         )
 
+
         //When a change is made in the locationRadioGroup, save the new selection to viewModel
-        binding.locationRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+        binding.locationRadioGroup.setOnCheckedChangeListener { radioGroup, checkedId ->
             val usingCustomLocationOldValue = sharedViewModel.usingCustomLocation.value
             val usingCustomLocationNewValue = checkedId == R.id.custom_location_radioButton
 
@@ -84,15 +85,21 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
                 return@setOnCheckedChangeListener
             }
 
+            /**
+             * If user tries to select currentLocationRadioButton and hasn't granted Location
+             * permission, check the customLocationRadioButton and call requestLocationPermission()
+             */
+            if (sharedViewModel.locationPermissionGrantedState.value != true && !usingCustomLocationNewValue) {
+                radioGroup.check(R.id.custom_location_radioButton)
+                sharedViewModel.requestLocationPermission()
+                return@setOnCheckedChangeListener
+            }
+
             sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue)
 
             if (usingCustomLocationNewValue) {
                 //When user selects "Use custom location" RadioButton, show autocompleteFragment.
-                val autocompleteFragmentRoot = autocompleteFragment.view
-                autocompleteFragmentRoot?.post {
-                    autocompleteFragmentRoot.findViewById<View>(R.id.places_autocomplete_search_input)
-                        .performClick()
-                }
+                showAutocompleteFragment()
             } else {
                 /**
                  * If using current location, set place equal to null as this will force
@@ -104,11 +111,7 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
 
         //Show autocompleteFragment when cityTextInputEditText is clicked.
         binding.cityTextInputEditText!!.setOnClickListener {
-            val autocompleteFragmentRoot = autocompleteFragment.view
-            autocompleteFragmentRoot?.post {
-                autocompleteFragmentRoot.findViewById<View>(R.id.places_autocomplete_search_input)
-                    .performClick()
-            }
+            showAutocompleteFragment()
         }
 
         //Create a Calendar instance and initialize it to the correct date
@@ -214,6 +217,16 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
         dateChangedHandler.removeCallbacksAndMessages(null)
 
         super.onDestroyView()
+    }
+
+
+    private fun showAutocompleteFragment() {
+        autocompleteFragment.setText("")
+        val autocompleteFragmentRoot = autocompleteFragment.view
+        autocompleteFragmentRoot?.post {
+            autocompleteFragmentRoot.findViewById<View>(R.id.places_autocomplete_search_input)
+                .performClick()
+        }
     }
 
     //Create BottomSheet

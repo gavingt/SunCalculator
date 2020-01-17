@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
 
-//TODO: If user denies permission and closes BottomSheet, set currentLocation TextView to red and display "No Location permission"
 //TODO: move calculations to separate project
 //TODO: layout variants need all changes we've made
 //TODO: publish app to Github, removing Google TimeZone API key first
@@ -48,7 +47,7 @@ class HomeFragment : Fragment() {
             Log.d("LOG", "loadingProgress: ${it}" )
         })
 
-        sharedViewModel.errorOccurred.observe(this, Observer{
+        sharedViewModel.inErrorState.observe(this, Observer{
             Log.d("LOG", "errorOccurred: ${it}" )
         })
 
