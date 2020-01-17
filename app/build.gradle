@@ -50,9 +50,6 @@ dependencies {
     //contains ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
 
-    //AndroidX SharedPreferences
-    implementation "androidx.preference:preference-ktx:1.1.0"
-
     // Navigation
     implementation "android.arch.navigation:navigation-fragment-ktx:$version_navigation"
     implementation "android.arch.navigation:navigation-ui-ktx:$version_navigation"
