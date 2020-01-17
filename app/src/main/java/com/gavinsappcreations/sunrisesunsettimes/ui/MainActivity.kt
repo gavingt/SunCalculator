@@ -1,4 +1,4 @@
-package com.gavinsappcreations.sunrisesunsettimes
+package com.gavinsappcreations.sunrisesunsettimes.ui
 
 import android.Manifest
 import android.content.Intent
@@ -7,14 +7,16 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProviders
+import com.gavinsappcreations.sunrisesunsettimes.BuildConfig
+import com.gavinsappcreations.sunrisesunsettimes.R
 import com.gavinsappcreations.sunrisesunsettimes.utilities.MILLISECONDS_PER_MINUTE
 import com.gavinsappcreations.sunrisesunsettimes.utilities.REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE
+import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
@@ -22,8 +24,10 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
+    //Create sharedViewModel as an AndroidViewModel, passing in Application to the Factory.
     private val sharedViewModel: SharedViewModel by lazy {
-        ViewModelProviders.of(this).get(SharedViewModel::class.java)
+        ViewModelProviders.of(this, SharedViewModel.Factory(application))
+            .get(SharedViewModel::class.java)
     }
 
     private var alertDialog: AlertDialog? = null
@@ -95,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         }
         builder.setNegativeButton("Choose location manually") { dialog, id ->
             sharedViewModel.onUsingCustomLocationChanged(usingCustomLocation = true)
-            sharedViewModel.onOptionsButtonPressed()
+            sharedViewModel.showOptionsBottomSheet()
             alertDialog?.dismiss()
         }
         builder.setTitle("App needs a location")

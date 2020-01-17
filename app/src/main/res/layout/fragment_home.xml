@@ -8,7 +8,7 @@
 
         <variable
             name="sharedViewModel"
-            type="com.gavinsappcreations.sunrisesunsettimes.SharedViewModel" />
+            type="com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel" />
     </data>
 
 
@@ -21,6 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/loading_sun_data"
+            tools:visibility="gone"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintBottom_toTopOf="@id/progressBar"
@@ -28,17 +29,50 @@
             app:layout_constraintRight_toRightOf="@id/progressBar"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.core.widget.ContentLoadingProgressBar
+        <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            setProgressBarVisibility="@{sharedViewModel.loadingInProgress}"
+            tools:visibility="gone"
+            android:visibility="gone"
+            fetchingSunData="@{sharedViewModel.fetchingSunData}"
+            hideProgressBarIfErrorOccurred="@{sharedViewModel.errorOccurred}"
+            updateProgressBarProgress="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/loading_textView" />
+
+        <TextView
+            android:id="@+id/error_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_connection"
+            tools:visibility="gone"
+            android:layout_marginBottom="@dimen/margin_small"
+            showIfErrorOccurred="@{sharedViewModel.errorOccurred}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintBottom_toTopOf="@id/retryButton"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/retryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/retry"
+            android:textAllCaps="false"
+            tools:visibility="gone"
+            android:onClick="@{()-> sharedViewModel.updateSunData()}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            showIfErrorOccurred="@{sharedViewModel.errorOccurred}"
+            app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/error_textView" />
 
         <ImageView
             android:id="@+id/sunrise_imageView"
@@ -48,8 +82,8 @@
             android:src="@drawable/sunrise"
             android:visibility="invisible"
             tools:visibility="visible"
-            loadingInProgress="@{sharedViewModel.loadingInProgress}"
-            datePickerSettling="@{sharedViewModel.datePickerSettling}"
+            hideSunDataIfErrorOccurred="@{sharedViewModel.errorOccurred}"
+            loadingInProgress="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@+id/sunrise_textView"
             app:layout_constraintHeight_percent="0.18"
             app:layout_constraintHorizontal_bias="0.5"
@@ -69,8 +103,8 @@
             android:textSize="30sp"
             android:visibility="invisible"
             tools:visibility="visible"
-            loadingInProgress="@{sharedViewModel.loadingInProgress}"
-            datePickerSettling="@{sharedViewModel.datePickerSettling}"
+            hideSunDataIfErrorOccurred="@{sharedViewModel.errorOccurred}"
+            loadingInProgress="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@+id/sunset_imageView"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -87,8 +121,8 @@
             android:src="@drawable/sunset"
             android:visibility="invisible"
             tools:visibility="visible"
-            loadingInProgress="@{sharedViewModel.loadingInProgress}"
-            datePickerSettling="@{sharedViewModel.datePickerSettling}"
+            hideSunDataIfErrorOccurred="@{sharedViewModel.errorOccurred}"
+            loadingInProgress="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@+id/sunset_textView"
             app:layout_constraintHeight_percent="0.18"
             app:layout_constraintHorizontal_bias="0.5"
@@ -106,8 +140,8 @@
             android:textSize="30sp"
             android:visibility="invisible"
             tools:visibility="visible"
-            loadingInProgress="@{sharedViewModel.loadingInProgress}"
-            datePickerSettling="@{sharedViewModel.datePickerSettling}"
+            hideSunDataIfErrorOccurred="@{sharedViewModel.errorOccurred}"
+            loadingInProgress="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -189,7 +223,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
             android:background="?attr/selectableItemBackground"
-            android:onClick="@{() -> sharedViewModel.onOptionsButtonPressed()}"
+            android:onClick="@{() -> sharedViewModel.showOptionsBottomSheet()}"
             android:text="@string/location_button"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"

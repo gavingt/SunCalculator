@@ -7,7 +7,7 @@
     <data>
         <variable
             name="sharedViewModel"
-            type="com.gavinsappcreations.sunrisesunsettimes.SharedViewModel" />
+            type="com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -101,16 +101,37 @@
 
                     </RadioGroup>
 
-                    <FrameLayout
-                        android:id="@+id/autocomplete_frameLayout"
-                        autocompleteBackground="@{sharedViewModel.usingCustomLocation}"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/city_textInputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_normal"
-                        android:background="@drawable/rounded_rectangle_enabled"
-                        app:layout_constraintTop_toBottomOf="@id/location_radioGroup">
+                        showIfUsingCustomLocation="@{sharedViewModel.usingCustomLocation}"
+                        android:layout_marginTop="16dp"
+                        app:boxCornerRadiusBottomEnd="8dp"
+                        app:boxCornerRadiusBottomStart="8dp"
+                        app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusTopStart="8dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:hint="@string/city">
 
-                    </FrameLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/city_textInputEditText"
+                            android:drawableStart="@drawable/baseline_search_black_24"
+                            android:drawablePadding="@dimen/margin_small"
+                            android:focusable="false"
+                            android:clickable="true"
+                            cityText="@{sharedViewModel.place}"
+                            android:cursorVisible="false"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <FrameLayout
+                        android:id="@+id/autocomplete_frameLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"/>
 
                 </LinearLayout>
 

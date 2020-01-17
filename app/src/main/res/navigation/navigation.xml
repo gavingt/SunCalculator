@@ -6,6 +6,6 @@
     app:startDestination="@id/sunsetFragment">
     <fragment
         android:id="@+id/sunsetFragment"
-        android:name="com.gavinsappcreations.sunrisesunsettimes.home.HomeFragment"
+        android:name="com.gavinsappcreations.sunrisesunsettimes.ui.HomeFragment"
         android:label="SunsetFragment" />
 </navigation>

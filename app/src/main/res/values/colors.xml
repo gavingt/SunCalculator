@@ -6,4 +6,5 @@
     <color name="colorAccent">#FF5252</color>
     <color name="colorBackground">#F2F2F2</color>
     <color name="colorDragIndicator">#BEBEBE</color>
+    <color name="colorDarkGray">#999999</color>
 </resources>

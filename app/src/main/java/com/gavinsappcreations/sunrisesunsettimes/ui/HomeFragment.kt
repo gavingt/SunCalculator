@@ -1,4 +1,4 @@
-package com.gavinsappcreations.sunrisesunsettimes.home
+package com.gavinsappcreations.sunrisesunsettimes.ui
 
 import android.os.Bundle
 import android.util.Log
@@ -8,18 +8,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.gavinsappcreations.sunrisesunsettimes.SharedViewModel
+import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
-import com.gavinsappcreations.sunrisesunsettimes.options.OptionsBottomSheetFragment
 
-//TODO: If user denies permission and closes BottomSheet, show floating snackbar or banner at top
-//TODO: add error handling for network timeout (try with really bad internet). Show as floating snackbar with RETRY button.
-       //do we handle this as try-catches in the coroutines?
-//TODO: sun data sometimes doesn't show up with bad internet
+//TODO: If user denies permission and closes BottomSheet, set currentLocation TextView to red and display "No Location permission"
 //TODO: move calculations to separate project
+//TODO: layout variants need all changes we've made
+//TODO: publish app to Github, removing Google TimeZone API key first
 
 class HomeFragment : Fragment() {
 
+    //Get reference to sharedViewModel that was already created by MainActivity.
     private val sharedViewModel: SharedViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java)
     }
@@ -38,15 +37,24 @@ class HomeFragment : Fragment() {
         // Giving the binding access to the OfflineViewModel
         binding.sharedViewModel = sharedViewModel
 
-        sharedViewModel.showOptionsBottomSheetEvent.observe(this, Observer {
+        sharedViewModel.triggerOptionsBottomSheetEvent.observe(this, Observer {
             if (it == true) {
                 showOptionsBottomSheet()
                 sharedViewModel.doneShowingOptionsBottomSheet()
             }
         })
 
+        sharedViewModel.loadingProgress.observe(this, Observer{
+            Log.d("LOG", "loadingProgress: ${it}" )
+        })
+
+        sharedViewModel.errorOccurred.observe(this, Observer{
+            Log.d("LOG", "errorOccurred: ${it}" )
+        })
+
         return binding.root
     }
+
 
     //This shows the OptionsBottomSheet that lets you change location, date, and toggle online/offline fetching.
     private fun showOptionsBottomSheet() {
@@ -55,7 +63,8 @@ class HomeFragment : Fragment() {
 
         //Prevent multiple BottomSheets from showing by null checking.
         if (fragment == null) {
-            OptionsBottomSheetFragment().show(
+            OptionsBottomSheetFragment()
+                .show(
                 requireActivity().supportFragmentManager,
                 "options_fragment"
             )

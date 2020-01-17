@@ -1,4 +1,4 @@
-package com.gavinsappcreations.sunrisesunsettimes.options
+package com.gavinsappcreations.sunrisesunsettimes.ui
 
 import android.os.Bundle
 import android.os.Handler
@@ -14,7 +14,7 @@ import androidx.annotation.Nullable
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.R
-import com.gavinsappcreations.sunrisesunsettimes.SharedViewModel
+import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.gavinsappcreations.sunrisesunsettimes.databinding.OptionsBottomSheetLayoutBinding
 import com.gavinsappcreations.sunrisesunsettimes.utilities.PLACES_API_KEY
 import com.gavinsappcreations.sunrisesunsettimes.utilities.waitForDatePickerToSettle
@@ -32,11 +32,13 @@ import java.util.*
 //BottomSheetDialogFragment that uses a custom theme which sets a rounded background
 class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
 
+    //we need a nullable version of binding so we can null it out in onDestroy().
     private var _binding: OptionsBottomSheetLayoutBinding? = null
-    // This property is only valid between onCreateView and onDestroyView.
+    //We use this version of binding throughout the Fragment so we don't need to do null checks.
     private val binding
         get() = _binding!!
 
+    //Get reference to sharedViewModel that was already created by MainActivity.
     private val sharedViewModel: SharedViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java)
     }
@@ -74,19 +76,38 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             val usingCustomLocationOldValue = sharedViewModel.usingCustomLocation.value
             val usingCustomLocationNewValue = checkedId == R.id.custom_location_radioButton
 
-            //If usingCustomLocation value is unchanged, just return.
+            /**
+             * If usingCustomLocation value is unchanged, just return. This just means the
+             * BottomSheet has opened and the RadioGroup has been initialized.
+             */
             if (usingCustomLocationOldValue == usingCustomLocationNewValue) {
                 return@setOnCheckedChangeListener
             }
 
             sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue)
 
-            /*
-            * If using current location, set place equal to null as this will force
-            * FusedLocationProvider to fetch user's current location.
-            */
-            if (!usingCustomLocationNewValue) {
+            if (usingCustomLocationNewValue) {
+                //When user selects "Use custom location" RadioButton, show autocompleteFragment.
+                val autocompleteFragmentRoot = autocompleteFragment.view
+                autocompleteFragmentRoot?.post {
+                    autocompleteFragmentRoot.findViewById<View>(R.id.places_autocomplete_search_input)
+                        .performClick()
+                }
+            } else {
+                /**
+                 * If using current location, set place equal to null as this will force
+                 * FusedLocationProvider to fetch user's current location.
+                 */
                 sharedViewModel.onPlaceChanged(null)
+            }
+        }
+
+        //Show autocompleteFragment when cityTextInputEditText is clicked.
+        binding.cityTextInputEditText!!.setOnClickListener {
+            val autocompleteFragmentRoot = autocompleteFragment.view
+            autocompleteFragmentRoot?.post {
+                autocompleteFragmentRoot.findViewById<View>(R.id.places_autocomplete_search_input)
+                    .performClick()
             }
         }
 
@@ -104,14 +125,12 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             calendar.get(Calendar.DAY_OF_MONTH)
         ) { _, year, monthOfYear, dayOfMonth ->
             timeDateChangedInMillis = System.currentTimeMillis()
-            sharedViewModel.onDatePickerSettlingChanged(true)
             //Call code in lambda only after DatePicker has settled
-            waitForDatePickerToSettle (dateChangedHandler, timeDateChangedInMillis) {
+            waitForDatePickerToSettle(dateChangedHandler, timeDateChangedInMillis) {
                 calendar.set(Calendar.YEAR, year)
                 calendar.set(Calendar.MONTH, monthOfYear)
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 sharedViewModel.onDateChanged(calendar.timeInMillis)
-                sharedViewModel.onDatePickerSettlingChanged(false)
             }
         }
 
@@ -131,28 +150,7 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
             behavior.skipCollapsed = true
             behavior.peekHeight = 0
-
-            /**
-             * Fix some issues with the default behavior of AutocompleteFragment. Since we're
-             * inflating autocompleteFragment programmatically, we need to listen for its Views
-             * to be created before we can modify them.
-             */
-            autocompleteFragment.view?.viewTreeObserver?.addOnGlobalLayoutListener {
-                val clearButton =
-                    autocompleteFragment.view!!.findViewById<ImageButton>(R.id.places_autocomplete_clear_button)
-
-                //If user presses autocompleteFragment's clearButton, set place = null
-                clearButton.setOnClickListener {
-                    sharedViewModel.onPlaceChanged(null)
-                }
-
-                //hide cursor from autocompleteFragment's editText, as it also prevents pasting
-                val autocompleteEditText = autocompleteFragment.view!!
-                    .findViewById<EditText>(R.id.places_autocomplete_search_input)
-                autocompleteEditText.isCursorVisible = false
-            }
         }
-
 
         //Inflate the autocompleteFragment
         val fm = childFragmentManager
@@ -180,21 +178,9 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             }
 
             override fun onError(status: Status) {
-                Log.i("LOG", "An error occurred: " + status);
+                //Do nothing, since the autocompleteFragment already displays errors to user.
             }
         })
-
-        sharedViewModel.place.observe(this, Observer { place ->
-            place?.let {
-                val placeName = place.name
-                if (placeName == getString(R.string.current_location)) {
-                    autocompleteFragment.setText("")
-                } else {
-                    autocompleteFragment.setText(place.name)
-                }
-            }
-        })
-
 
     }
 
@@ -220,6 +206,12 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
                 Toast.LENGTH_LONG
             ).show()
         }
+
+        /**
+         * If user closes the BottomSheet while the DatePicker is spinning, we ignore the result
+         * by removing the dateChangedHandler callbacks.
+         */
+        dateChangedHandler.removeCallbacksAndMessages(null)
 
         super.onDestroyView()
     }

@@ -7,7 +7,7 @@
     <data>
         <variable
             name="sharedViewModel"
-            type="com.gavinsappcreations.sunrisesunsettimes.SharedViewModel" />
+            type="com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -146,7 +146,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/margin_normal"
             android:background="?attr/selectableItemBackground"
-            android:onClick="@{() -> sharedViewModel.onOptionsButtonPressed()}"
+            android:onClick="@{() -> sharedViewModel.showOptionsBottomSheet()}"
             android:text="@string/location_button"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"
