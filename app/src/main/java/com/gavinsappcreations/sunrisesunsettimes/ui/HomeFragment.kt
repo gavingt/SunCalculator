@@ -41,14 +41,6 @@ class HomeFragment : Fragment() {
             }
         })
 
-        sharedViewModel.loadingProgress.observe(this, Observer {
-            Log.d("LOG", "loadingProgress: ${it}")
-        })
-
-        sharedViewModel.inErrorState.observe(this, Observer {
-            Log.d("LOG", "errorOccurred: ${it}")
-        })
-
         return binding.root
     }
 
