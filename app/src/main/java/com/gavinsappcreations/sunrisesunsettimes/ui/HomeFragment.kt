@@ -8,11 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
+import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 
-//TODO: move calculations to separate project
-//TODO: layout variants need all changes we've made
 //TODO: publish app to Github, removing Google TimeZone API key first
 
 class HomeFragment : Fragment() {
@@ -43,12 +41,12 @@ class HomeFragment : Fragment() {
             }
         })
 
-        sharedViewModel.loadingProgress.observe(this, Observer{
-            Log.d("LOG", "loadingProgress: ${it}" )
+        sharedViewModel.loadingProgress.observe(this, Observer {
+            Log.d("LOG", "loadingProgress: ${it}")
         })
 
-        sharedViewModel.inErrorState.observe(this, Observer{
-            Log.d("LOG", "errorOccurred: ${it}" )
+        sharedViewModel.inErrorState.observe(this, Observer {
+            Log.d("LOG", "errorOccurred: ${it}")
         })
 
         return binding.root
@@ -64,9 +62,9 @@ class HomeFragment : Fragment() {
         if (fragment == null) {
             OptionsBottomSheetFragment()
                 .show(
-                requireActivity().supportFragmentManager,
-                "options_fragment"
-            )
+                    requireActivity().supportFragmentManager,
+                    "options_fragment"
+                )
         }
     }
 

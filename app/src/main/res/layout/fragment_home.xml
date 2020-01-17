@@ -11,7 +11,6 @@
             type="com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel" />
     </data>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -21,69 +20,68 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/loading_sun_data"
-            tools:visibility="gone"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintBottom_toTopOf="@id/progressBar"
             app:layout_constraintLeft_toLeftOf="@id/progressBar"
             app:layout_constraintRight_toRightOf="@id/progressBar"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:visibility="gone" />
 
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="140dp"
-            android:layout_height="wrap_content"
-            tools:visibility="gone"
-            android:visibility="gone"
             fetchingSunData="@{sharedViewModel.fetchingSunData}"
             hideProgressBarIfInErrorState="@{sharedViewModel.inErrorState}"
             progressBarProgress="@{sharedViewModel.loadingProgress}"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/loading_textView" />
+            app:layout_constraintTop_toBottomOf="@id/loading_textView"
+            tools:visibility="gone" />
 
         <TextView
             android:id="@+id/error_textView"
+            showIfInErrorState="@{sharedViewModel.inErrorState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/no_connection"
-            tools:visibility="gone"
             android:layout_marginBottom="@dimen/margin_small"
-            showIfInErrorState="@{sharedViewModel.inErrorState}"
+            android:text="@string/no_connection"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintBottom_toTopOf="@id/retryButton"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:visibility="gone" />
 
         <Button
             android:id="@+id/retryButton"
+            showIfInErrorState="@{sharedViewModel.inErrorState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="@{()-> sharedViewModel.updateSunData()}"
             android:text="@string/retry"
             android:textAllCaps="false"
-            tools:visibility="gone"
-            android:onClick="@{()-> sharedViewModel.updateSunData()}"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            showIfInErrorState="@{sharedViewModel.inErrorState}"
             app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/error_textView" />
+            app:layout_constraintTop_toBottomOf="@id/error_textView"
+            tools:visibility="gone" />
 
         <ImageView
             android:id="@+id/sunrise_imageView"
+            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
+            loadingInProgress="@{sharedViewModel.loadingProgress}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:contentDescription="@string/sunrise"
             android:src="@drawable/sunrise"
             android:visibility="invisible"
-            tools:visibility="visible"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@+id/sunrise_textView"
             app:layout_constraintHeight_percent="0.18"
             app:layout_constraintHorizontal_bias="0.5"
@@ -91,10 +89,13 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/sunrise_textView"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/sunrise_textView"
+            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
+            loadingInProgress="@{sharedViewModel.loadingProgress}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_normal"
@@ -102,36 +103,36 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="30sp"
             android:visibility="invisible"
-            tools:visibility="visible"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@+id/sunset_imageView"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sunrise_imageView"
-            tools:text="Sunrise: 7:29am" />
+            tools:text="Sunrise: 7:29am"
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/sunset_imageView"
+            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
+            loadingInProgress="@{sharedViewModel.loadingProgress}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/margin_extra_large"
             android:contentDescription="@string/sunset"
             android:src="@drawable/sunset"
             android:visibility="invisible"
-            tools:visibility="visible"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@+id/sunset_textView"
             app:layout_constraintHeight_percent="0.18"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sunrise_textView" />
+            app:layout_constraintTop_toBottomOf="@+id/sunrise_textView"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/sunset_textView"
+            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
+            loadingInProgress="@{sharedViewModel.loadingProgress}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_normal"
@@ -139,15 +140,13 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="30sp"
             android:visibility="invisible"
-            tools:visibility="visible"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
             app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sunset_imageView"
-            tools:text="Sunset: 5:41pm" />
+            tools:text="Sunset: 5:41pm"
+            tools:visibility="visible" />
 
         <View
             android:id="@+id/top_bar_background"
@@ -171,8 +170,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginBottom="@dimen/margin_small"
-            android:contentDescription="@string/location"
             android:alpha="0.6"
+            android:contentDescription="@string/location"
             android:paddingBottom="@dimen/margin_extra_extra_small"
             android:src="@drawable/ic_map_marker_black_24dp"
             app:layout_constraintBottom_toTopOf="@id/date_imageView"
@@ -180,11 +179,11 @@
 
         <TextView
             android:id="@+id/location_textView"
+            homeFragmentCityName="@{sharedViewModel.place}"
+            locationPermissionGranted="@{sharedViewModel.locationPermissionGrantedState}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/margin_small"
-            homeFragmentCityName="@{sharedViewModel.place}"
-            locationPermissionGranted="@{sharedViewModel.locationPermissionGrantedState}"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintBottom_toBottomOf="@id/location_imageView"
             app:layout_constraintLeft_toRightOf="@id/location_imageView"
@@ -198,8 +197,8 @@
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_small"
             android:layout_marginBottom="@dimen/margin_normal"
-            android:contentDescription="@string/date"
             android:alpha="0.6"
+            android:contentDescription="@string/date"
             android:src="@drawable/baseline_today_black_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent" />

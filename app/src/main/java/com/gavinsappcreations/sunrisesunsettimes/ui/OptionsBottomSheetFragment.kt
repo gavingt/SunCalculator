@@ -2,22 +2,18 @@ package com.gavinsappcreations.sunrisesunsettimes.ui
 
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.annotation.Nullable
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.R
-import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.gavinsappcreations.sunrisesunsettimes.databinding.OptionsBottomSheetLayoutBinding
-import com.gavinsappcreations.sunrisesunsettimes.utilities.PLACES_API_KEY
+import com.gavinsappcreations.sunrisesunsettimes.utilities.GOOGLE_PLACES_AND_TIMEZONE_API_KEY
 import com.gavinsappcreations.sunrisesunsettimes.utilities.waitForDatePickerToSettle
+import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -68,7 +64,7 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
 
         Places.initialize(
             requireActivity().application,
-            PLACES_API_KEY
+            GOOGLE_PLACES_AND_TIMEZONE_API_KEY
         )
 
 

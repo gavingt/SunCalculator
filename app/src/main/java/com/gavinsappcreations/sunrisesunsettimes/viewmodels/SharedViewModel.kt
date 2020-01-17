@@ -6,11 +6,12 @@ import androidx.lifecycle.*
 import com.gavinsappcreations.sunrisesunsettimes.network.SunNetwork
 import com.gavinsappcreations.sunrisesunsettimes.network.TimeZoneNetwork
 import com.gavinsappcreations.sunrisesunsettimes.network.asDomainModel
-import com.gavinsappcreations.sunrisesunsettimes.utilities.PLACES_API_KEY
+import com.gavinsappcreations.sunrisesunsettimes.utilities.GOOGLE_PLACES_AND_TIMEZONE_API_KEY
 import com.gavinsappcreations.sunrisesunsettimes.utilities.formatDateResultFromApi
 import com.gavinsappcreations.sunrisesunsettimes.utilities.isNetworkAvailable
 import com.google.android.libraries.places.api.model.Place
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,7 +34,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     private val _inErrorState = MutableLiveData<Boolean?>()
     val inErrorState: LiveData<Boolean?>
         get() = _inErrorState
-
 
 
     //Event that determines when optionsBottomSheet should be shown.
@@ -65,7 +65,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     }
 
 
-
     private val _locationPermissionGrantedState = MutableLiveData<Boolean?>()
     val locationPermissionGrantedState: LiveData<Boolean?>
         get() = _locationPermissionGrantedState
@@ -89,7 +88,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     }
 
 
-
     /**
      * We need a second variable to signal to ProgressBar when loading is occurring, since
      * the loadingProgress is updated so rapidly in some circumstances that all its values aren't
@@ -99,7 +97,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     private val _fetchingSunData = MutableLiveData<Boolean?>()
     val fetchingSunData: LiveData<Boolean?>
         get() = _fetchingSunData
-
 
 
     private val _usingCustomLocation = MutableLiveData<Boolean>()
@@ -180,7 +177,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
                         .getTimeZoneData(
                             "${place.latLng!!.latitude},${place.latLng!!.longitude}",
                             calendar.timeInMillis.shr(3),
-                            PLACES_API_KEY
+                            GOOGLE_PLACES_AND_TIMEZONE_API_KEY
                         )
                         .await().asDomainModel().timeZoneId
                 }

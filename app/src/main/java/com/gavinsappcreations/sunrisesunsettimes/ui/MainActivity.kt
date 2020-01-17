@@ -9,8 +9,8 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.BuildConfig
 import com.gavinsappcreations.sunrisesunsettimes.R
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
 
 
     //Callback received when a permissions request has been completed.
-    override fun onRequestPermissionsResult (
+    override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String?>,
         grantResults: IntArray
     ) {
@@ -127,15 +127,17 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Permission was granted.
-            sharedViewModel.onLocationPermissionGrantedStateChanged(true)
 
             /**
-             * Permission will only be requested when using current location, so we can set this
-             * value here. This is only needed in case the user initially denied the permission,
-             * then granted it from the BottomSheet.
+             * If locationPermissionGranted.value != true and we've made it here, this means
+             * we've just granted the permission from the BottomSheet. So to set the RadioButton
+             * back to "Using current location", we need to change usingCustomLocation.value here.
              */
-            sharedViewModel.onUsingCustomLocationChanged(false)
+            if (sharedViewModel.locationPermissionGrantedState.value != true) {
+                sharedViewModel.onUsingCustomLocationChanged(false)
+            }
+
+            sharedViewModel.onLocationPermissionGrantedStateChanged(true)
 
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->

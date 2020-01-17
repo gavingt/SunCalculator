@@ -18,7 +18,7 @@ interface SunService {
         @Query("lat") latitude: Double,
         @Query("lng") longitude: Double,
         @Query("date") date: String
-    ) : Deferred<NetworkSunDataContainer>
+    ): Deferred<NetworkSunDataContainer>
 }
 
 /**

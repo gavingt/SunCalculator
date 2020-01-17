@@ -5,15 +5,19 @@ import android.graphics.Typeface
 import android.text.format.DateUtils
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import android.widget.*
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
-import com.gavinsappcreations.sunrisesunsettimes.R
 import androidx.databinding.BindingAdapter
+import com.gavinsappcreations.sunrisesunsettimes.R
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,7 +30,7 @@ fun TextView.setDateText(timeInMillis: Long?) {
     } else {
         val calendar: Calendar = Calendar.getInstance()
         calendar.timeInMillis = timeInMillis
-        val formatter = SimpleDateFormat("MMM dd, yyyy")
+        val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.US)
         text = formatter.format(calendar.time)
     }
 }

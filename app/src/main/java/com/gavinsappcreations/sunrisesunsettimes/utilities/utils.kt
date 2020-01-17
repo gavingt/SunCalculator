@@ -35,12 +35,15 @@ fun formatDateResultFromApi(apiDateString: String, timeZone: TimeZone): String {
 }
 
 
-
 /**
  * Wait DATE_PICKER_SETTLE_TIME and if timeDateChangedInMillis doesn't change,
  * call the lambda runAfterSettling().
  */
-fun waitForDatePickerToSettle(handler: Handler, timeDateChangedInMillis: Long, runAfterSettling: () -> Unit) {
+fun waitForDatePickerToSettle(
+    handler: Handler,
+    timeDateChangedInMillis: Long,
+    runAfterSettling: () -> Unit
+) {
     handler.removeCallbacksAndMessages(null)
     val runnable = Runnable {
         if (System.currentTimeMillis() - timeDateChangedInMillis > DATE_PICKER_SETTLE_TIME) {
@@ -51,31 +54,30 @@ fun waitForDatePickerToSettle(handler: Handler, timeDateChangedInMillis: Long, r
 }
 
 
-
 //Tests if network connection is available.
 fun isNetworkAvailable(context: Context?): Boolean {
     if (context == null) return false
     val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            if (capabilities != null) {
-                when {
-                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> return true
-                }
-            }
-        } else {
-            try {
-                val activeNetworkInfo = connectivityManager.activeNetworkInfo
-                if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
-                    return true
-                }
-            } catch (e: Exception) {
-                Log.i("update_status", "" + e.message)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            when {
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> return true
             }
         }
+    } else {
+        try {
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+                return true
+            }
+        } catch (e: Exception) {
+            Log.i("update_status", "" + e.message)
+        }
+    }
     return false
 }
