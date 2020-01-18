@@ -155,7 +155,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
             return
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
 
             val calendar = Calendar.getInstance()
             if (_dateInMillis.value != null) {
@@ -168,18 +168,14 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
                 //If we're using a custom location, overwrite timeZoneId with the result from the TimeZone API.
                 if (_usingCustomLocation.value == true) {
-                    /**
-                     * TimeZoneNetwork.timeZone.getTimeZoneData() is already returning a deferred thanks
-                     * to Retrofit, so we don't need to call it from an async block. We just need to
-                     * await() its result.
-                     */
+                    //Retrofit handles the await() call for us.
                     timeZoneId = TimeZoneNetwork.timeZone
                         .getTimeZoneData(
                             "${place.latLng!!.latitude},${place.latLng!!.longitude}",
                             calendar.timeInMillis.shr(3),
                             GOOGLE_PLACES_AND_TIMEZONE_API_KEY
                         )
-                        .await().asDomainModel().timeZoneId
+                        .body()!!.asDomainModel().timeZoneId
                 }
 
                 //Update loadingProgress.value to 1 to indicate the first API call is complete.
@@ -190,11 +186,13 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
                 val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
                 val formattedDateForApi = formatter.format(calendar.time)
 
+                //Retrofit handles the await() call for us.
                 val sunData = SunNetwork.sunData.getSunData(
                     place.latLng!!.latitude,
                     place.latLng!!.longitude,
                     formattedDateForApi
-                ).await().results.asDomainModel()
+                ).body()!!.results.asDomainModel()
+
 
                 /**
                  * The API result for sunset/sunrise times doesn't include the date, so we
