@@ -45,7 +45,14 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        requestLocationPermission()
+        /**
+         * Only request location permission if we're not using a custom location. Otherwise, if the
+         * user denied the permission, they'd be prompted with the permission dialog on every
+         * configuration change.
+         */
+        if (sharedViewModel.usingCustomLocation.value != true) {
+            requestLocationPermission()
+        }
 
         sharedViewModel.triggerRequestLocationPermissionEvent.observe(this, Observer {
             if (it == true) {
@@ -132,9 +139,13 @@ class MainActivity : AppCompatActivity() {
              * If locationPermissionGranted.value != true and we've made it here, this means
              * we've just granted the permission from the BottomSheet. So to set the RadioButton
              * back to "Using current location", we need to change usingCustomLocation.value here.
+             * Also, to set a new place.value, we need to set the existing place.value to null,
+             * since it could possibly be a custom location (and therefore the onPlaceChanged()
+             * method further below wouldn't get called.
              */
             if (sharedViewModel.locationPermissionGrantedState.value != true) {
                 sharedViewModel.onUsingCustomLocationChanged(false)
+                sharedViewModel.onPlaceChanged(null)
             }
 
             sharedViewModel.onLocationPermissionGrantedStateChanged(true)
@@ -166,7 +177,8 @@ class MainActivity : AppCompatActivity() {
 
         } else { // Permission was denied and user checked the "Don't ask again" checkbox.
             sharedViewModel.onLocationPermissionGrantedStateChanged(null)
-            showUserDeniedPermissionsAlertDialog(true)
+            //TODO: don't show this if using custom location
+                showUserDeniedPermissionsAlertDialog(true)
         }
     }
 

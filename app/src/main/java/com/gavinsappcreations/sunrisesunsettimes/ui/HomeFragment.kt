@@ -11,7 +11,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 
-//TODO: publish app to Github, removing Google TimeZone API key first
+//TODO: implement changes recommended in Reddit thread
+//TODO: update Github with changes and let Reddit know (include screenshots)
 
 class HomeFragment : Fragment() {
 
