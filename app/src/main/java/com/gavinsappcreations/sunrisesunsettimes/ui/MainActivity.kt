@@ -24,7 +24,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    //Create sharedViewModel as an AndroidViewModel, passing in Application to the Factory.
+    // Create sharedViewModel as an AndroidViewModel, passing in Application to the Factory.
     private val sharedViewModel: SharedViewModel by lazy {
         ViewModelProviders.of(this, SharedViewModel.Factory(application))
             .get(SharedViewModel::class.java)
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         title = getString(R.string.app_name)
 
-        //If place is null, we fetch the user's location.
+        // If place is null, we fetch the user's location.
         sharedViewModel.place.observe(this, Observer {
             if (it == null) {
                 requestLocationPermission()
@@ -112,6 +112,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         builder.setNegativeButton(getString(R.string.use_custom_location)) { _, _ ->
+            sharedViewModel.onLocationPermissionGrantedStateChanged(false)
             sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue = true)
             alertDialog?.dismiss()
         }
@@ -175,10 +176,10 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-        } else { // Permission was denied and user checked the "Don't ask again" checkbox.
-            sharedViewModel.onLocationPermissionGrantedStateChanged(null)
-            //TODO: don't show this if using custom location
-                showUserDeniedPermissionsAlertDialog(true)
+        } else { // Permission was denied.
+            sharedViewModel.onLocationPermissionGrantedStateChanged(false)
+            sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue = true)
+            showUserDeniedPermissionsAlertDialog(true)
         }
     }
 

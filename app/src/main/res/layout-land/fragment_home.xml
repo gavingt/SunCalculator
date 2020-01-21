@@ -31,9 +31,7 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
-            fetchingSunData="@{sharedViewModel.fetchingSunData}"
-            hideProgressBarIfInErrorState="@{sharedViewModel.inErrorState}"
-            progressBarProgress="@{sharedViewModel.loadingProgress}"
+            updateProgressAndVisibility="@{sharedViewModel.networkState}"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -45,7 +43,7 @@
 
         <TextView
             android:id="@+id/error_textView"
-            showIfInErrorState="@{sharedViewModel.inErrorState}"
+            showIfNetworkError="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_small"
@@ -60,7 +58,7 @@
 
         <Button
             android:id="@+id/retryButton"
-            showIfInErrorState="@{sharedViewModel.inErrorState}"
+            showIfNetworkError="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{()-> sharedViewModel.updateSunData()}"
@@ -75,8 +73,7 @@
 
         <ImageView
             android:id="@+id/sunrise_imageView"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
+            sunDataVisibility="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:contentDescription="@string/sunrise"
@@ -93,8 +90,7 @@
 
         <TextView
             android:id="@+id/sunrise_textView"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
+            sunDataVisibility="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -112,8 +108,7 @@
 
         <ImageView
             android:id="@+id/sunset_imageView"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
+            sunDataVisibility="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:contentDescription="@string/sunset"
@@ -130,8 +125,7 @@
 
         <TextView
             android:id="@+id/sunset_textView"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
+            sunDataVisibility="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

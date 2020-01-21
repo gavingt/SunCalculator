@@ -16,7 +16,7 @@ import java.util.*
  */
 fun formatDateResultFromApi(apiDateString: String, timeZone: TimeZone): String {
 
-    //Parse the date string returned by the API into a Date object.
+    // Parse the date string returned by the API into a Date object.
     val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss aa", Locale.ENGLISH)
     val apiDate = simpleDateFormat.parse(apiDateString)
 
@@ -29,7 +29,7 @@ fun formatDateResultFromApi(apiDateString: String, timeZone: TimeZone): String {
     calendar.add(Calendar.MILLISECOND, timeZone.getOffset(calendar.timeInMillis))
     val correctedDate = calendar.time
 
-    //Apply the time pattern we want to show in our app.
+    // Apply the time pattern we want to show in our app.
     simpleDateFormat.applyPattern("hh:mm aa")
     return simpleDateFormat.format(correctedDate)
 }
@@ -54,7 +54,7 @@ fun waitForDatePickerToSettle(
 }
 
 
-//Tests if network connection is available.
+// Tests if network connection is available
 fun isNetworkAvailable(context: Context?): Boolean {
     if (context == null) return false
     val connectivityManager =

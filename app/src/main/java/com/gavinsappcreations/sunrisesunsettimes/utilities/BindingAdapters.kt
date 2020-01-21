@@ -11,6 +11,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.gavinsappcreations.sunrisesunsettimes.R
+import com.gavinsappcreations.sunrisesunsettimes.network.NetworkState
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-//Formats and sets the text for the selected date.
+// Formats and sets the text for the selected date.
 @BindingAdapter("dateText")
 fun TextView.setDateText(timeInMillis: Long?) {
     if (timeInMillis == null || DateUtils.isToday(timeInMillis)
@@ -36,30 +37,32 @@ fun TextView.setDateText(timeInMillis: Long?) {
 }
 
 
-//Controls the visibility of sun data views while loading is occurring and if an error has occurred.
-@BindingAdapter("loadingInProgress", "hideSunDataIfInErrorState")
-fun View.setSunViewVisibility(loadingProgress: Int, inErrorState: Boolean?) {
+// Controls the visibility of sun data views while loading is occurring and if an error has occurred.
+@BindingAdapter("sunDataVisibility")
+fun View.setSunViewVisibility(networkState: NetworkState) {
 
-    if (inErrorState == true) {
-        visibility = View.GONE
-        return
-    }
-
-    if (loadingProgress < 2) {
-        visibility = View.GONE
-    } else {
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(LOADING_PROGRESS_ANIMATION_TIME)
-            visibility = View.VISIBLE
+    when (networkState) {
+        NetworkState.NetworkFailure -> {
+            visibility = View.GONE
+            return
+        }
+        NetworkState.NetworkSuccess -> {
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(LOADING_PROGRESS_ANIMATION_TIME)
+                visibility = View.VISIBLE
+            }
+        }
+        else -> { //networkState == NetworkState.NetworkLoading
+            visibility = View.GONE
         }
     }
 }
 
 
-//Sets visibility of views that should be shown only if a network error has occurred.
-@BindingAdapter("showIfInErrorState")
-fun View.showIfInErrorState(inErrorState: Boolean?) {
-    visibility = if (inErrorState == true) {
+// Sets visibility of views that should be shown only if a network error has occurred.
+@BindingAdapter("showIfNetworkError")
+fun View.showIfNetworkError(networkState: NetworkState) {
+    visibility = if (networkState == NetworkState.NetworkFailure) {
         View.VISIBLE
     } else {
         View.GONE
@@ -72,28 +75,33 @@ fun View.showIfInErrorState(inErrorState: Boolean?) {
  * by 50 so that the ProgressBar actually has some values to animate over. This method also
  * handles setting the visibility of the ProgressBar based on multiple factors.
  */
-@BindingAdapter("progressBarProgress", "hideProgressBarIfInErrorState", "fetchingSunData")
+@BindingAdapter("updateProgressAndVisibility")
 fun ProgressBar.updateProgressBarProgress(
-    newProgress: Int,
-    inErrorState: Boolean?,
-    fetchingSunData: Boolean?
+    networkState: NetworkState
 ) {
 
-    if (inErrorState == true) {
-        visibility = View.GONE
-        return
-    }
+    val progressStart: Int
+    val progressEnd: Int
 
-    /**
-     * If sun data is being fetched, always set to visible. It will only be hidden after
-     * the final animation has ended.
-     */
-    if (fetchingSunData == true) {
-        visibility = View.VISIBLE
+    when (networkState) {
+        NetworkState.NetworkAwaitingPermission -> {
+            return
+        }
+        NetworkState.NetworkFailure -> {
+            visibility = View.GONE
+            return
+        }
+        NetworkState.NetworkSuccess -> {
+            progressStart = 50
+            progressEnd = 100
+        }
+        else -> { // networkState = NetworkState.NetworkLoading
+            visibility = View.VISIBLE
+            val networkLoading = networkState as NetworkState.NetworkLoading
+            progressStart = (networkLoading.progress - 1) * 50
+            progressEnd = networkLoading.progress * 50
+        }
     }
-
-    val progressStart = (newProgress - 1) * 50
-    val progressEnd = newProgress * 50
 
     progress = progressStart
 
@@ -101,7 +109,7 @@ fun ProgressBar.updateProgressBarProgress(
     animation.duration = LOADING_PROGRESS_ANIMATION_TIME
     animation.interpolator = DecelerateInterpolator()
     animation.start()
-    //Wait until animation ends to hide ProgressBar.
+    // Wait until animation ends to hide ProgressBar.
     animation.doOnEnd {
         if (progressEnd == 100) {
             visibility = View.GONE
@@ -110,7 +118,7 @@ fun ProgressBar.updateProgressBarProgress(
 }
 
 
-//Sets visibility of cityTextInputLayout based on the value of usingCustomLocation.
+// Sets visibility of cityTextInputLayout based on the value of usingCustomLocation.
 @BindingAdapter("showIfUsingCustomLocation")
 fun TextInputLayout.showIfUsingCustomLocation(usingCustomLocation: Boolean?) {
     visibility = if (usingCustomLocation == true) {
@@ -121,7 +129,7 @@ fun TextInputLayout.showIfUsingCustomLocation(usingCustomLocation: Boolean?) {
 }
 
 
-//Sets text in BottomSheet's cityTextInputEditText based on the value of place.name.
+// Sets text in BottomSheet's cityTextInputEditText based on the value of place.name.
 @BindingAdapter("bottomSheetCityText")
 fun TextInputEditText.setBottomSheetCityText(place: Place?) {
     setText(
@@ -134,7 +142,7 @@ fun TextInputEditText.setBottomSheetCityText(place: Place?) {
 }
 
 
-//Sets text in HomeFragment's locationTextView based on the value of place.name.
+// Sets text in HomeFragment's locationTextView based on the value of place.name.
 @BindingAdapter("homeFragmentCityName", "locationPermissionGranted")
 fun TextView.setHomeFragmentCityText(place: Place?, locationPermissionGranted: Boolean?) {
 
@@ -147,10 +155,12 @@ fun TextView.setHomeFragmentCityText(place: Place?, locationPermissionGranted: B
             text = context.getString(R.string.current_location)
             setTextColor(ContextCompat.getColor(context, R.color.colorText))
             setTypeface(null, Typeface.NORMAL)
-        } else {
+        } else if (locationPermissionGranted == false) {
             text = context.getString(R.string.missing_permission)
             setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
             setTypeface(null, Typeface.BOLD)
+        } else {
+            text = ""
         }
     }
 

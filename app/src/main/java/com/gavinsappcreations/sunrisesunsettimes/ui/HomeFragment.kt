@@ -12,11 +12,11 @@ import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 
 //TODO: implement changes recommended in Reddit thread
-//TODO: update Github with changes and let Reddit know (include screenshots)
+//TODO: update Github with changes and let Reddit know
 
 class HomeFragment : Fragment() {
 
-    //Get reference to sharedViewModel that was already created by MainActivity.
+    // Get reference to sharedViewModel that was already created by MainActivity.
     private val sharedViewModel: SharedViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java)
     }
@@ -46,12 +46,12 @@ class HomeFragment : Fragment() {
     }
 
 
-    //This shows the OptionsBottomSheet that lets you change location, date, and toggle online/offline fetching.
+    // This shows the OptionsBottomSheet that lets you change location, date, and toggle online/offline fetching.
     private fun showOptionsBottomSheet() {
         val fragment =
             requireActivity().supportFragmentManager.findFragmentByTag("options_fragment")
 
-        //Prevent multiple BottomSheets from showing by null checking.
+        // Prevent multiple BottomSheets from showing by null checking.
         if (fragment == null) {
             OptionsBottomSheetFragment()
                 .show(
