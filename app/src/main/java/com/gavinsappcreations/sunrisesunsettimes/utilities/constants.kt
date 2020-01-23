@@ -1,7 +1,7 @@
 package com.gavinsappcreations.sunrisesunsettimes.utilities
 
 // TODO: Add a valid Google API key here that has both the Places and TimeZone APIs activated.
-const val GOOGLE_PLACES_AND_TIMEZONE_API_KEY = "AIzaSyCiNoSDVQtYBByS97Mou3v0k3o_1hR38qE"
+const val GOOGLE_PLACES_AND_TIMEZONE_API_KEY = ""
 
 const val MILLISECONDS_PER_MINUTE = 60000
 const val REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE = 1

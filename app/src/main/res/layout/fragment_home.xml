@@ -66,6 +66,7 @@
             android:layout_height="wrap_content"
             android:onClick="@{()-> sharedViewModel.updateSunData()}"
             android:text="@string/retry"
+            android:backgroundTint="?attr/colorAccent"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:visibility="gone"

@@ -11,4 +11,5 @@
     <color name="colorOnBackgroundMediumContrast">#999999</color>
     <color name="colorOnBackgroundLowContrast">#777777</color>
     <color name="colorBottomSheetBackground">#2B2B2B</color>
+    <color name="colorErrorText">#E31E1E</color>
 </resources>

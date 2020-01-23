@@ -13,8 +13,7 @@ import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-//TODO: toggling location off and on breaks app until I view Maps app
-//TODO: update Github with changes
+// TODO: update Github with changes
 
 class HomeFragment : Fragment() {
 

@@ -160,6 +160,17 @@ class MainActivity : AppCompatActivity() {
                 sharedViewModel.onPlaceChanged(null)
             }
 
+
+            /**
+             * If using current location and we already have the current location, don't try to
+             * re-fetch current location. This fixes a problem that was caused when the user
+             * disabled Location on their device and then toggled dark theme, which would cause
+             * the error Views to appear on top of the sun data views.
+             */
+            if (sharedViewModel.usingCustomLocation.value != true && sharedViewModel.place.value != null) {
+                return
+            }
+
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location == null) {
