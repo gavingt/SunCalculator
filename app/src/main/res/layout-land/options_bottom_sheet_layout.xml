@@ -50,8 +50,8 @@
                 android:id="@+id/autocomplete_cardView"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                app:contentPadding="@dimen/margin_normal"
                 app:cardElevation="@dimen/card_view_elevation"
+                app:contentPadding="@dimen/margin_normal"
                 app:layout_constraintBottom_toBottomOf="@id/datePicker_cardView"
                 app:layout_constraintEnd_toStartOf="@+id/datePicker_cardView"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -82,21 +82,19 @@
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/location_title_textView">
 
-                        <RadioButton
+                        <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/current_location_radioButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:buttonTint="@color/radio_button_color"
+                            android:layout_marginBottom="-8dp"
                             android:checked="@{!sharedViewModel.usingCustomLocation}"
                             android:paddingStart="@dimen/margin_small"
                             android:text="@string/use_current_location" />
 
-                        <RadioButton
+                        <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/custom_location_radioButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="-8dp"
-                            android:buttonTint="@color/radio_button_color"
                             android:checked="@{sharedViewModel.usingCustomLocation}"
                             android:paddingStart="@dimen/margin_small"
                             android:text="@string/use_custom_location" />
@@ -132,7 +130,7 @@
                         android:id="@+id/autocomplete_frameLayout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
 
                 </LinearLayout>
 

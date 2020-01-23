@@ -1,7 +1,9 @@
 package com.gavinsappcreations.sunrisesunsettimes.utilities
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
+import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
@@ -11,6 +13,7 @@ import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -90,6 +93,14 @@ fun isNetworkAvailable(context: Context?): Boolean {
     }
     return false
 }
+
+
+// Returns true if device has location enabled, and false if it's disabled.
+fun isLocationEnabled(application: Application) : Boolean {
+    val locationManager = application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+}
+
 
 
 // We use this method to get the default text color programmatically

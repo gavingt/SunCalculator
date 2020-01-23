@@ -60,10 +60,24 @@ fun View.setSunViewVisibility(networkState: NetworkState) {
 }
 
 
-// Sets visibility of views that should be shown only if a network error has occurred.
-@BindingAdapter("showIfNetworkError")
-fun View.showIfNetworkError(networkState: NetworkState) {
-    visibility = if (networkState == NetworkState.NetworkFailure) {
+// Sets visibility of views that should be shown if network error or device's location is disabled.
+@BindingAdapter("showIfError")
+fun View.showIfError(networkState: NetworkState) {
+
+    val networkErrorOccurred = networkState == NetworkState.NetworkFailure
+    val locationDisabledErrorOccurred = networkState == NetworkState.LocationDisabled
+
+    if (this.id == R.id.error_textView) {
+        this as TextView
+
+        if (locationDisabledErrorOccurred) {
+            text = context.getString(R.string.enable_location_instructions)
+        } else if (networkErrorOccurred) {
+            text = context.getString(R.string.no_network_connection)
+        }
+    }
+
+    visibility = if (networkErrorOccurred || locationDisabledErrorOccurred) {
         View.VISIBLE
     } else {
         View.GONE
@@ -85,7 +99,7 @@ fun ProgressBar.updateProgressBarProgress(
     val progressEnd: Int
 
     when (networkState) {
-        NetworkState.AwaitingPermission -> {
+        NetworkState.AwaitingPermission, NetworkState.LocationDisabled -> {
             return
         }
         NetworkState.NetworkFailure -> {
@@ -144,29 +158,37 @@ fun TextInputEditText.setBottomSheetCityText(place: Place?) {
 
 
 // Sets text in HomeFragment's locationTextView based on the value of place.name.
-@BindingAdapter("homeFragmentCityName", "locationPermissionGranted")
-fun TextView.setHomeFragmentCityText(place: Place?, locationPermissionGranted: Boolean?) {
+@BindingAdapter("homeFragmentCityName", "networkState")
+fun TextView.setHomeFragmentCityText(place: Place?, networkState: NetworkState) {
 
     if (place != null && place.name != context.getString(R.string.current_location)) {
         text = place.name
-
         @ColorInt
         val color = resolveColorAttr(context, android.R.attr.textColorPrimary)
         setTextColor(color)
         setTypeface(null, Typeface.NORMAL)
     } else {
-        if (locationPermissionGranted == true) {
-            text = context.getString(R.string.current_location)
-            @ColorInt
-            val color = resolveColorAttr(context, android.R.attr.textColorPrimary)
-            setTextColor(color)
-            setTypeface(null, Typeface.NORMAL)
-        } else if (locationPermissionGranted == false) {
-            text = context.getString(R.string.missing_permission)
-            setTextColor(ContextCompat.getColor(context, R.color.colorErrorText))
-            setTypeface(null, Typeface.BOLD)
-        } else {
-            text = ""
+        when (networkState) {
+            NetworkState.AwaitingPermission -> {
+                text = ""
+            }
+            NetworkState.PermissionDenied -> {
+                text = context.getString(R.string.missing_permission)
+                setTextColor(ContextCompat.getColor(context, R.color.colorErrorText))
+                setTypeface(null, Typeface.BOLD)
+            }
+            NetworkState.LocationDisabled -> {
+                text = context.getString(R.string.location_disabled)
+                setTextColor(ContextCompat.getColor(context, R.color.colorErrorText))
+                setTypeface(null, Typeface.BOLD)
+            }
+            else -> {
+                text = context.getString(R.string.current_location)
+                @ColorInt
+                val color = resolveColorAttr(context, android.R.attr.textColorPrimary)
+                setTextColor(color)
+                setTypeface(null, Typeface.NORMAL)
+            }
         }
     }
 

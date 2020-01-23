@@ -7,7 +7,6 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -17,8 +16,10 @@ import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.BuildConfig
 import com.gavinsappcreations.sunrisesunsettimes.R
 import com.gavinsappcreations.sunrisesunsettimes.databinding.ActivityMainBinding
+import com.gavinsappcreations.sunrisesunsettimes.network.NetworkState
 import com.gavinsappcreations.sunrisesunsettimes.utilities.MILLISECONDS_PER_MINUTE
 import com.gavinsappcreations.sunrisesunsettimes.utilities.REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE
+import com.gavinsappcreations.sunrisesunsettimes.utilities.isLocationEnabled
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -100,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setPositiveButton(
             "Enable permission"
-        ) { dialog, id ->
+        ) { _, _ ->
             // User wants to enable Location permission
             if (bUserCheckedDontShowAgainBox) {
                 val intent = Intent()
@@ -122,7 +123,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         builder.setNegativeButton(getString(R.string.use_custom_location)) { _, _ ->
-            sharedViewModel.onLocationPermissionGrantedStateChanged(false)
+            sharedViewModel.onNetworkStateChanged(NetworkState.PermissionDenied)
             sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue = true)
             alertDialog?.dismiss()
         }
@@ -147,29 +148,38 @@ class MainActivity : AppCompatActivity() {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             /**
-             * If locationPermissionGranted.value != true and we've made it here, this means
-             * we've just granted the permission from the BottomSheet. So to set the RadioButton
-             * back to "Using current location", we need to change usingCustomLocation.value here.
-             * Also, to set a new place.value, we need to set the existing place.value to null,
-             * since it could possibly be a custom location (and therefore the onPlaceChanged()
-             * method further below wouldn't get called.
+             * If networkState.value == NetworkState.AwaitingPermission, this means either
+             * we've just started the app or we've just granted the permission from the BottomSheet.
+             * So to set the RadioButton back to "Using current location", we need to change
+             * usingCustomLocation.value here. Also, to set a new place.value, we need to set the
+             * existing place.value to null, since it could possibly be a custom location
+             * (and therefore the onPlaceChanged() method further below wouldn't get called.
              */
-            if (sharedViewModel.locationPermissionGrantedState.value != true) {
+            if (sharedViewModel.networkState.value == NetworkState.AwaitingPermission) {
                 sharedViewModel.onUsingCustomLocationChanged(false)
                 sharedViewModel.onPlaceChanged(null)
             }
 
-            sharedViewModel.onLocationPermissionGrantedStateChanged(true)
-
-
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                // Got last known location. In some rare situations this can be null.
                 if (location == null) {
-                    // If lastLocation is null, we create our own LocationRequest to find it ourselves.
-                    forceFindLocation()
+                    if (isLocationEnabled(application)) {
+                        /**
+                         * If location is null and the device has location enabled, we can for the
+                         * device to fetch a location by creating our own LocationRequest.
+                         */
+                        forceFetchLocation()
+                    } else {
+                        /**
+                         * If location is null and the device has location disabled, we change
+                         * the network state to NetworkState.LocationDisabled so we can alert
+                         * the user.
+                         */
+                        sharedViewModel.onNetworkStateChanged(NetworkState.LocationDisabled)
+                    }
                     return@addOnSuccessListener
                 }
+
                 val placeBuilder = Place.builder()
                 placeBuilder.setLatLng(LatLng(location.latitude, location.longitude))
                 placeBuilder.setName(getString(R.string.current_location))
@@ -190,7 +200,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         } else { // Permission was denied.
-            sharedViewModel.onLocationPermissionGrantedStateChanged(false)
+            sharedViewModel.onNetworkStateChanged(NetworkState.PermissionDenied)
             sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue = true)
             showUserDeniedPermissionsAlertDialog(true)
         }
@@ -202,7 +212,7 @@ class MainActivity : AppCompatActivity() {
      * will return a null location. This method forces the device to find a location by forming a
      * LocationRequest and repeating until it gets a non-null Location result.
      */
-    private fun forceFindLocation() {
+    private fun forceFetchLocation() {
         val locationRequest = LocationRequest.create()
         locationRequest.interval = 2500
         locationRequest.fastestInterval = 5000

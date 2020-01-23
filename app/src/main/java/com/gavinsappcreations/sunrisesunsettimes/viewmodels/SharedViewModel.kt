@@ -23,7 +23,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         get() = _place
 
 
-
     private val _networkState = MutableLiveData<NetworkState>()
     val networkState: LiveData<NetworkState>
         get() = _networkState
@@ -37,10 +36,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     private val _triggerOptionsBottomSheetEvent = MutableLiveData<Boolean>()
     val triggerOptionsBottomSheetEvent: LiveData<Boolean>
         get() = _triggerOptionsBottomSheetEvent
-
-    private val _locationPermissionGrantedState = MutableLiveData<Boolean?>()
-    val locationPermissionGrantedState: LiveData<Boolean?>
-        get() = _locationPermissionGrantedState
 
     private val _triggerRequestLocationPermissionEvent = MutableLiveData<Boolean>()
     val triggerRequestLocationPermissionEvent: LiveData<Boolean>
@@ -69,12 +64,19 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         get() = _sunsetTime
 
 
-    fun onPlaceChanged(place: Place?) {
-        if (_place.value != place) {
-            _place.value = place
+    fun onPlaceChanged(newPlace: Place?) {
+        if (_place.value != newPlace) {
+            _place.value = newPlace
             updateSunData()
         }
     }
+
+    fun onNetworkStateChanged(newNetworkState: NetworkState) {
+        if (_networkState.value != newNetworkState) {
+            _networkState.value = newNetworkState
+        }
+    }
+
 
     // This is called through data binding once optionsButton is pressed.
     fun showOptionsBottomSheet() {
@@ -86,9 +88,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         _triggerOptionsBottomSheetEvent.value = false
     }
 
-    fun onLocationPermissionGrantedStateChanged(locationPermissionGranted: Boolean?) {
-        _locationPermissionGrantedState.value = locationPermissionGranted
-    }
 
     // This is called from OptionsBottomSheetFragment when it needs to request the Location permission.
     fun requestLocationPermission() {
@@ -116,6 +115,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
         val place = _place.value
         if (place == null || place.latLng == null || place.utcOffsetMinutes == null) {
+            requestLocationPermission()
             return
         }
 

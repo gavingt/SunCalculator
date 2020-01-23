@@ -6,11 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.annotation.Nullable
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.R
 import com.gavinsappcreations.sunrisesunsettimes.databinding.OptionsBottomSheetLayoutBinding
+import com.gavinsappcreations.sunrisesunsettimes.network.NetworkState
 import com.gavinsappcreations.sunrisesunsettimes.utilities.GOOGLE_PLACES_AND_TIMEZONE_API_KEY
 import com.gavinsappcreations.sunrisesunsettimes.utilities.waitForDatePickerToSettle
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
@@ -80,11 +80,15 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
                 return@setOnCheckedChangeListener
             }
 
+            val locationPermissionGranted =
+                sharedViewModel.networkState.value != NetworkState.AwaitingPermission &&
+                        sharedViewModel.networkState.value != NetworkState.PermissionDenied
+
             /**
              * If user tries to select currentLocationRadioButton and hasn't granted Location
              * permission, check the customLocationRadioButton and call requestLocationPermission()
              */
-            if (sharedViewModel.locationPermissionGrantedState.value != true && !usingCustomLocationNewValue) {
+            if (!locationPermissionGranted && !usingCustomLocationNewValue) {
                 radioGroup.check(R.id.custom_location_radioButton)
                 sharedViewModel.requestLocationPermission()
                 return@setOnCheckedChangeListener
@@ -185,7 +189,6 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-
     // If no place has been selected, detect it here and revert to current location.
     override fun onDestroyView() {
 
@@ -196,6 +199,13 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
          * class instance when we close the Fragment
          */
         _binding = null
+
+        // Handle case when user selects "custom location" but doesn't enter a location.
+        if (sharedViewModel.usingCustomLocation.value == true
+            && sharedViewModel.place.value?.name == getString(R.string.current_location)
+        ) {
+            sharedViewModel.onUsingCustomLocationChanged(false)
+        }
 
         /**
          * If user closes the BottomSheet while the DatePicker is spinning, we ignore the result
@@ -219,8 +229,5 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): BottomSheetDialog {
         return BottomSheetDialog(requireContext(), theme)
     }
-
-    // Set custom theme on BottomSheet
-    //override fun getTheme(): Int = R.style.BottomSheetTheme
 
 }
