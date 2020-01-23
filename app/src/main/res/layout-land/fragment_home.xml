@@ -98,7 +98,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="27sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/top_bar_background"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_bar_background"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="@id/sunrise_imageView"
             app:layout_constraintRight_toRightOf="@id/sunrise_imageView"
@@ -133,7 +133,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="27sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/top_bar_background"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_bar_background"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="@id/sunset_imageView"
             app:layout_constraintRight_toRightOf="@id/sunset_imageView"
@@ -142,10 +142,10 @@
             tools:visibility="visible" />
 
         <View
-            android:id="@+id/top_bar_background"
+            android:id="@+id/bottom_bar_background"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@android:color/white"
+            android:background="@color/colorBackgroundVariant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="@id/horizontal_bar" />
 
@@ -163,10 +163,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginBottom="@dimen/margin_small"
-            android:alpha="0.6"
+            android:tint="?attr/colorOnBackgroundVariant"
             android:contentDescription="@string/current_location"
             android:paddingBottom="@dimen/margin_extra_extra_small"
-            android:src="@drawable/ic_map_marker_black_24dp"
+            android:src="@drawable/ic_place_black_24dp"
             app:layout_constraintBottom_toTopOf="@id/date_imageView"
             app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -190,9 +190,9 @@
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_small"
             android:layout_marginBottom="@dimen/margin_normal"
-            android:alpha="0.6"
+            android:tint="?attr/colorOnBackgroundVariant"
             android:contentDescription="@string/date"
-            android:src="@drawable/baseline_today_black_24"
+            android:src="@drawable/ic_today_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -215,10 +215,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
-            android:background="?attr/selectableItemBackground"
+            style="@style/MyTextButtonTheme"
             android:onClick="@{() -> sharedViewModel.showOptionsBottomSheet()}"
             android:text="@string/location_button"
-            android:textColor="@color/colorAccent"
+            android:textColor="?attr/colorAccent"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@id/date_imageView"
             app:layout_constraintRight_toRightOf="parent"

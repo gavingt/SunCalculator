@@ -1,27 +1,41 @@
 <resources>
 
-
-
     <!-- Base application theme. -->
-    <style name="CommonTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="CommonTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorBackgroundVariant">@color/colorBackgroundVariant</item>
+        <item name="colorOnBackgroundVariant">@color/colorOnBackgroundVariant</item>
+        <item name="colorOnBackgroundMediumContrast">@color/colorOnBackgroundMediumContrast</item>
+        <item name="colorOnBackgroundLowContrast">@color/colorOnBackgroundLowContrast</item>
         <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetTheme</item>
     </style>
+
 
     <style name="AppTheme" parent="CommonTheme" />
 
 
-    <!-- set the rounded drawable as background to your bottom sheet -->
-    <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
+
+    <!-- Responsible for the theming of the BottomSheet -->
+    <style name="BottomSheetTheme" parent="@style/Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@drawable/bg_bottom_sheet_dialog_fragment</item>
+    </style>
+
+
+    <!-- Sets the rounded drawable as background to the BottomSheet-->
+    <style name="BottomSheet" parent="@style/Theme.MaterialComponents.Light.BottomSheetDialog">
         <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
     </style>
 
-    <style name="BottomSheetTheme" parent="@style/Theme.Design.Light.BottomSheetDialog">>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="bottomSheetStyle">@style/BottomSheet</item>
+
+    <!-- Change ripple color on TextButtons -->
+    <style name="MyTextButtonTheme" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="rippleColor">@color/colorOnBackgroundLowContrast</item>
     </style>
+
 
 </resources>

@@ -10,9 +10,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-//TODO: implement changes recommended in Reddit thread
-//TODO: update Github with changes and let Reddit know
+//TODO: toggling location off and on breaks app until I view Maps app
+//TODO: update Github with changes
 
 class HomeFragment : Fragment() {
 
@@ -58,6 +60,7 @@ class HomeFragment : Fragment() {
                     requireActivity().supportFragmentManager,
                     "options_fragment"
                 )
+
         }
     }
 

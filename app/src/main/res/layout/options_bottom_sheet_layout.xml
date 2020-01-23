@@ -27,7 +27,7 @@
                 android:layout_height="4dp"
                 android:contentDescription="@string/drag_bottomsheet"
                 android:src="@drawable/drag_indicator"
-                android:tint="@color/colorDragIndicator"
+                android:tint="?attr/colorOnBackgroundMediumContrast"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -44,13 +44,12 @@
                 android:textSize="23sp"
                 app:layout_constraintTop_toBottomOf="@id/drag_indicator" />
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/autocomplete_cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/white"
-                app:cardUseCompatPadding="true"
                 app:contentPadding="@dimen/margin_normal"
+                app:cardElevation="@dimen/card_view_elevation"
                 android:layout_margin="@dimen/margin_normal"
                 app:layout_constraintLeft_toLeftOf="@id/datePicker_cardView"
                 app:layout_constraintRight_toRightOf="@id/datePicker_cardView"
@@ -106,17 +105,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         showIfUsingCustomLocation="@{sharedViewModel.usingCustomLocation}"
-                        android:layout_marginTop="16dp"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
+                        android:layout_marginTop="@dimen/margin_normal"
+                        app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
+                        app:boxCornerRadiusBottomStart="@dimen/corner_radius"
+                        app:boxCornerRadiusTopEnd="@dimen/corner_radius"
+                        app:boxCornerRadiusTopStart="@dimen/corner_radius"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:hint="@string/city">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/city_textInputEditText"
-                            android:drawableStart="@drawable/baseline_search_black_24"
+                            android:drawableStart="@drawable/ic_search_black_24dp"
                             android:drawablePadding="@dimen/margin_small"
                             android:focusable="false"
                             android:clickable="true"
@@ -135,19 +134,18 @@
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/datePicker_cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/white"
-                app:cardUseCompatPadding="true"
                 app:contentPadding="@dimen/margin_normal"
                 android:layout_marginTop="@dimen/margin_24dp"
                 android:layout_marginLeft="@dimen/margin_normal"
                 android:layout_marginRight="@dimen/margin_normal"
                 android:layout_marginBottom="@dimen/margin_normal"
+                app:cardElevation="@dimen/card_view_elevation"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -179,7 +177,7 @@
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

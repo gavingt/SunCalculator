@@ -67,7 +67,6 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
             GOOGLE_PLACES_AND_TIMEZONE_API_KEY
         )
 
-
         // When a change is made in the locationRadioGroup, save the new selection to viewModel
         binding.locationRadioGroup.setOnCheckedChangeListener { radioGroup, checkedId ->
             val usingCustomLocationOldValue = sharedViewModel.usingCustomLocation.value
@@ -145,8 +144,8 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
         view.viewTreeObserver.addOnGlobalLayoutListener {
             // Force BottomSheet to start fully expanded and set peekHeight=0 so it never peeks.
             val dialog = dialog as BottomSheetDialog?
-            val bottomSheet: FrameLayout? =
-                dialog!!.findViewById(com.google.android.material.R.id.design_bottom_sheet)
+            val bottomSheet: FrameLayout =
+                dialog!!.findViewById(com.google.android.material.R.id.design_bottom_sheet)!!
             val behavior: BottomSheetBehavior<*> = BottomSheetBehavior.from(bottomSheet)
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
             behavior.skipCollapsed = true
@@ -185,6 +184,8 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
 
     }
 
+
+
     // If no place has been selected, detect it here and revert to current location.
     override fun onDestroyView() {
 
@@ -195,18 +196,6 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
          * class instance when we close the Fragment
          */
         _binding = null
-
-        // Handle case when user selects "custom location" but doesn't enter a location.
-        if (sharedViewModel.usingCustomLocation.value == true
-            && sharedViewModel.place.value?.name == getString(R.string.current_location)
-        ) {
-            sharedViewModel.onUsingCustomLocationChanged(false)
-            Toast.makeText(
-                requireContext(),
-                "No custom location entered. Reverting to current location.",
-                Toast.LENGTH_LONG
-            ).show()
-        }
 
         /**
          * If user closes the BottomSheet while the DatePicker is spinning, we ignore the result
@@ -232,6 +221,6 @@ class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     // Set custom theme on BottomSheet
-    override fun getTheme(): Int = R.style.BottomSheetTheme
+    //override fun getTheme(): Int = R.style.BottomSheetTheme
 
 }

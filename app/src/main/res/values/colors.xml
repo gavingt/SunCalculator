@@ -4,8 +4,12 @@
     <color name="colorPrimaryDark">#1976D2</color>
     <color name="colorPrimaryLight">#BBDEFB</color>
     <color name="colorAccent">#FF5252</color>
-    <color name="colorBackground">#F2F2F2</color>
-    <color name="colorDragIndicator">#BEBEBE</color>
-    <color name="colorDarkGray">#999999</color>
-    <color name="colorText">#282828</color>
+    <color name="colorBackground">#EEEEEE</color>
+    <color name="colorBackgroundVariant">#FFFFFF</color>
+    <color name="colorOnBackground">#000000</color>
+    <color name="colorOnBackgroundVariant">#222222</color>
+    <color name="colorBottomSheetBackground">#EEEEEE</color>
+    <color name="colorOnBackgroundMediumContrast">#AAAAAA</color>
+    <color name="colorOnBackgroundLowContrast">#C3C3C3</color>
+    <color name="colorErrorText">#CC0000</color>
 </resources>

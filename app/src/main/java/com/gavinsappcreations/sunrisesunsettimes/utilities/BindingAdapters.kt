@@ -7,6 +7,7 @@ import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
@@ -84,7 +85,7 @@ fun ProgressBar.updateProgressBarProgress(
     val progressEnd: Int
 
     when (networkState) {
-        NetworkState.NetworkAwaitingPermission -> {
+        NetworkState.AwaitingPermission -> {
             return
         }
         NetworkState.NetworkFailure -> {
@@ -148,16 +149,21 @@ fun TextView.setHomeFragmentCityText(place: Place?, locationPermissionGranted: B
 
     if (place != null && place.name != context.getString(R.string.current_location)) {
         text = place.name
-        setTextColor(ContextCompat.getColor(context, R.color.colorText))
+
+        @ColorInt
+        val color = resolveColorAttr(context, android.R.attr.textColorPrimary)
+        setTextColor(color)
         setTypeface(null, Typeface.NORMAL)
     } else {
         if (locationPermissionGranted == true) {
             text = context.getString(R.string.current_location)
-            setTextColor(ContextCompat.getColor(context, R.color.colorText))
+            @ColorInt
+            val color = resolveColorAttr(context, android.R.attr.textColorPrimary)
+            setTextColor(color)
             setTypeface(null, Typeface.NORMAL)
         } else if (locationPermissionGranted == false) {
             text = context.getString(R.string.missing_permission)
-            setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+            setTextColor(ContextCompat.getColor(context, R.color.colorErrorText))
             setTypeface(null, Typeface.BOLD)
         } else {
             text = ""

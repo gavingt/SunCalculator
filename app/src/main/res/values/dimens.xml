@@ -11,5 +11,10 @@
     <dimen name="margin_top_icon">10dp</dimen>
     <dimen name="bottom_sheet_corner_radius">12dp</dimen>
     <dimen name="bottom_sheet_top_padding">16dp</dimen>
+    <dimen name="margin_12dp">12dp</dimen>
     <dimen name="margin_28dp">28dp</dimen>
+    <dimen name="card_view_elevation">4dp</dimen>
+    <dimen name="text_button_size">17sp</dimen>
+    <dimen name="icon_alpha">0.9</dimen>
+    <dimen name="corner_radius">8dp</dimen>
 </resources>

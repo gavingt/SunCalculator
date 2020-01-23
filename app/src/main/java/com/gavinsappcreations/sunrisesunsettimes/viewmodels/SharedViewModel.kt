@@ -29,7 +29,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         get() = _networkState
 
     init {
-        _networkState.value = NetworkState.NetworkAwaitingPermission
+        _networkState.value = NetworkState.AwaitingPermission
     }
 
 

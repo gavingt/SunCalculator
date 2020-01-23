@@ -7,22 +7,31 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.BuildConfig
 import com.gavinsappcreations.sunrisesunsettimes.R
+import com.gavinsappcreations.sunrisesunsettimes.databinding.ActivityMainBinding
 import com.gavinsappcreations.sunrisesunsettimes.utilities.MILLISECONDS_PER_MINUTE
 import com.gavinsappcreations.sunrisesunsettimes.utilities.REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
 import java.util.*
 
+
 class MainActivity : AppCompatActivity() {
+
+    lateinit var binding: ActivityMainBinding
 
     // Create sharedViewModel as an AndroidViewModel, passing in Application to the Factory.
     private val sharedViewModel: SharedViewModel by lazy {
@@ -35,13 +44,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        title = getString(R.string.app_name)
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.toolbar.title = getString(R.string.app_name)
 
         // If place is null, we fetch the user's location.
         sharedViewModel.place.observe(this, Observer {
             if (it == null) {
-                requestLocationPermission()
+                requestLocationFromFusedLocationProvider()
             }
         })
 
@@ -51,18 +61,18 @@ class MainActivity : AppCompatActivity() {
          * configuration change.
          */
         if (sharedViewModel.usingCustomLocation.value != true) {
-            requestLocationPermission()
+            requestLocationFromFusedLocationProvider()
         }
 
         sharedViewModel.triggerRequestLocationPermissionEvent.observe(this, Observer {
             if (it == true) {
-                requestLocationPermission()
+                requestLocationFromFusedLocationProvider()
                 sharedViewModel.doneRequestingLocationPermission()
             }
         })
     }
 
-    private fun requestLocationPermission() {
+    private fun requestLocationFromFusedLocationProvider() {
         val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(
             this,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -151,10 +161,15 @@ class MainActivity : AppCompatActivity() {
 
             sharedViewModel.onLocationPermissionGrantedStateChanged(true)
 
+
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 // Got last known location. In some rare situations this can be null.
-                location ?: return@addOnSuccessListener
+                if (location == null) {
+                    // If lastLocation is null, we create our own LocationRequest to find it ourselves.
+                    forceFindLocation()
+                    return@addOnSuccessListener
+                }
                 val placeBuilder = Place.builder()
                 placeBuilder.setLatLng(LatLng(location.latitude, location.longitude))
                 placeBuilder.setName(getString(R.string.current_location))
@@ -172,8 +187,6 @@ class MainActivity : AppCompatActivity() {
                 if (sharedViewModel.place.value == null) {
                     sharedViewModel.onPlaceChanged(placeBuilder.build())
                 }
-
-
             }
 
         } else { // Permission was denied.
@@ -181,6 +194,34 @@ class MainActivity : AppCompatActivity() {
             sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue = true)
             showUserDeniedPermissionsAlertDialog(true)
         }
+    }
+
+
+    /**
+     * If user recently toggled their Location setting off/on on their device, FusedLocationProvider
+     * will return a null location. This method forces the device to find a location by forming a
+     * LocationRequest and repeating until it gets a non-null Location result.
+     */
+    private fun forceFindLocation() {
+        val locationRequest = LocationRequest.create()
+        locationRequest.interval = 2500
+        locationRequest.fastestInterval = 5000
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        val locationCallback: LocationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                val mostRecentLocation = locationResult.lastLocation
+                if (mostRecentLocation != null) {
+                    // We found a location, so we can now stop further location updates.
+                    LocationServices.getFusedLocationProviderClient(this@MainActivity)
+                        .removeLocationUpdates(this)
+
+                    // Now that the device has a location, request it from FusedLocationProvider.
+                    requestLocationFromFusedLocationProvider()
+                }
+            }
+        }
+        LocationServices.getFusedLocationProviderClient(this)
+            .requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
 }

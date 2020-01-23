@@ -143,10 +143,10 @@
             tools:visibility="visible" />
 
         <View
-            android:id="@+id/top_bar_background"
+            android:id="@+id/bottom_bar_background"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@android:color/white"
+            android:background="?attr/colorBackgroundVariant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="@id/horizontal_bar" />
 
@@ -155,7 +155,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="@dimen/margin_normal"
-            android:background="@android:color/black"
+            android:background="?attr/colorOnBackgroundVariant"
             app:layout_constraintBottom_toTopOf="@id/location_imageView" />
 
         <ImageView
@@ -164,10 +164,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginBottom="@dimen/margin_small"
-            android:alpha="0.6"
+            android:tint="?attr/colorOnBackgroundVariant"
             android:contentDescription="@string/location"
             android:paddingBottom="@dimen/margin_extra_extra_small"
-            android:src="@drawable/ic_map_marker_black_24dp"
+            android:src="@drawable/ic_place_black_24dp"
             app:layout_constraintBottom_toTopOf="@id/date_imageView"
             app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -178,7 +178,7 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/margin_small"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
             app:layout_constraintBottom_toBottomOf="@id/location_imageView"
             app:layout_constraintLeft_toRightOf="@id/location_imageView"
             app:layout_constraintTop_toTopOf="@id/location_imageView"
@@ -191,9 +191,9 @@
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_small"
             android:layout_marginBottom="@dimen/margin_normal"
-            android:alpha="0.6"
+            android:tint="?attr/colorOnBackgroundVariant"
             android:contentDescription="@string/date"
-            android:src="@drawable/baseline_today_black_24"
+            android:src="@drawable/ic_today_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -204,7 +204,7 @@
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/margin_small"
             android:layout_weight="1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
             app:layout_constraintBottom_toBottomOf="@id/date_imageView"
             app:layout_constraintLeft_toRightOf="@id/date_imageView"
             app:layout_constraintTop_toTopOf="@id/date_imageView"
@@ -216,11 +216,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
-            android:background="?attr/selectableItemBackground"
+            style="@style/MyTextButtonTheme"
             android:onClick="@{() -> sharedViewModel.showOptionsBottomSheet()}"
+            android:letterSpacing="0"
             android:text="@string/location_button"
-            android:textColor="@color/colorAccent"
-            android:textSize="16sp"
+            android:textColor="?attr/colorAccent"
+            android:textSize="@dimen/text_button_size"
             app:layout_constraintBottom_toBottomOf="@id/date_imageView"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@id/location_imageView" />
