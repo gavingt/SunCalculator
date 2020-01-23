@@ -13,8 +13,6 @@ import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-// TODO: update Github with changes
-
 class HomeFragment : Fragment() {
 
     // Get reference to sharedViewModel that was already created by MainActivity.
