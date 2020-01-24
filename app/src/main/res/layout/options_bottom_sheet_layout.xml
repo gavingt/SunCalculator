@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="sharedViewModel"
             type="com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel" />
@@ -16,10 +17,11 @@
         android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:paddingTop="@dimen/margin_normal"
-            android:paddingBottom="@dimen/margin_normal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingTop="@dimen/margin_normal"
+            android:paddingBottom="@dimen/margin_normal">
 
             <ImageView
                 android:id="@+id/drag_indicator"
@@ -27,7 +29,7 @@
                 android:layout_height="4dp"
                 android:contentDescription="@string/drag_bottomsheet"
                 android:src="@drawable/drag_indicator"
-                android:tint="@color/colorDragIndicator"
+                android:tint="?attr/colorOnBackgroundMediumContrast"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -44,14 +46,13 @@
                 android:textSize="23sp"
                 app:layout_constraintTop_toBottomOf="@id/drag_indicator" />
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/autocomplete_cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/white"
-                app:cardUseCompatPadding="true"
-                app:contentPadding="@dimen/margin_normal"
                 android:layout_margin="@dimen/margin_normal"
+                app:cardElevation="@dimen/card_view_elevation"
+                app:contentPadding="@dimen/margin_normal"
                 app:layout_constraintLeft_toLeftOf="@id/datePicker_cardView"
                 app:layout_constraintRight_toRightOf="@id/datePicker_cardView"
                 app:layout_constraintTop_toBottomOf="@id/title_textView">
@@ -67,8 +68,8 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="@dimen/margin_normal"
                         android:text="@string/location"
-                        android:textSize="18sp"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:textSize="18sp"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -81,20 +82,19 @@
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/location_title_textView">
 
-                        <RadioButton
+                        <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/current_location_radioButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:buttonTint="@color/radio_button_color"
+                            android:layout_marginBottom="-8dp"
                             android:checked="@{!sharedViewModel.usingCustomLocation}"
                             android:paddingStart="@dimen/margin_small"
                             android:text="@string/use_current_location" />
 
-                        <RadioButton
+                        <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/custom_location_radioButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:buttonTint="@color/radio_button_color"
                             android:checked="@{sharedViewModel.usingCustomLocation}"
                             android:paddingStart="@dimen/margin_small"
                             android:text="@string/use_custom_location" />
@@ -103,27 +103,27 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/city_textInputLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        showIfUsingCustomLocation="@{sharedViewModel.usingCustomLocation}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        showIfUsingCustomLocation="@{sharedViewModel.usingCustomLocation}"
-                        android:layout_marginTop="16dp"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:hint="@string/city">
+                        android:layout_marginTop="@dimen/margin_normal"
+                        android:hint="@string/city"
+                        app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
+                        app:boxCornerRadiusBottomStart="@dimen/corner_radius"
+                        app:boxCornerRadiusTopEnd="@dimen/corner_radius"
+                        app:boxCornerRadiusTopStart="@dimen/corner_radius">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/city_textInputEditText"
-                            android:drawableStart="@drawable/baseline_search_black_24"
-                            android:drawablePadding="@dimen/margin_small"
-                            android:focusable="false"
-                            android:clickable="true"
                             bottomSheetCityText="@{sharedViewModel.place}"
-                            android:cursorVisible="false"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:cursorVisible="false"
+                            android:drawableStart="@drawable/ic_search_black_24dp"
+                            android:drawablePadding="@dimen/margin_small"
+                            android:focusable="false" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -131,26 +131,25 @@
                         android:id="@+id/autocomplete_frameLayout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/datePicker_cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/white"
-                app:cardUseCompatPadding="true"
-                app:contentPadding="@dimen/margin_normal"
-                android:layout_marginTop="@dimen/margin_24dp"
                 android:layout_marginLeft="@dimen/margin_normal"
+                android:layout_marginTop="@dimen/margin_24dp"
                 android:layout_marginRight="@dimen/margin_normal"
                 android:layout_marginBottom="@dimen/margin_normal"
+                app:cardElevation="@dimen/card_view_elevation"
+                app:contentPadding="@dimen/margin_normal"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/autocomplete_cardView">
 
                 <LinearLayout
@@ -163,8 +162,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/date"
-                        android:textSize="18sp"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:textSize="18sp"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -179,7 +178,7 @@
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

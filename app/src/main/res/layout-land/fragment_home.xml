@@ -31,9 +31,7 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
-            fetchingSunData="@{sharedViewModel.fetchingSunData}"
-            hideProgressBarIfInErrorState="@{sharedViewModel.inErrorState}"
-            progressBarProgress="@{sharedViewModel.loadingProgress}"
+            updateProgressAndVisibility="@{sharedViewModel.networkState}"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -45,38 +43,41 @@
 
         <TextView
             android:id="@+id/error_textView"
-            showIfInErrorState="@{sharedViewModel.inErrorState}"
+            showIfError="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_small"
-            android:text="@string/no_connection"
+            android:gravity="center"
+            android:paddingStart="@dimen/margin_normal"
+            android:paddingEnd="@dimen/margin_normal"
+            android:text="@string/no_network_connection"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/retryButton"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:visibility="gone" />
+            app:layout_constraintVertical_chainStyle="packed" />
 
         <Button
             android:id="@+id/retryButton"
-            showIfInErrorState="@{sharedViewModel.inErrorState}"
+            showIfError="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="?attr/colorAccent"
             android:onClick="@{()-> sharedViewModel.updateSunData()}"
             android:text="@string/retry"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/horizontal_bar"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/error_textView"
-            tools:visibility="gone" />
+            app:layout_constraintTop_toBottomOf="@id/error_textView" />
 
         <ImageView
             android:id="@+id/sunrise_imageView"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
+            sunDataVisibility="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:contentDescription="@string/sunrise"
@@ -93,8 +94,7 @@
 
         <TextView
             android:id="@+id/sunrise_textView"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
+            sunDataVisibility="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -102,7 +102,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="27sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/top_bar_background"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_bar_background"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="@id/sunrise_imageView"
             app:layout_constraintRight_toRightOf="@id/sunrise_imageView"
@@ -112,8 +112,7 @@
 
         <ImageView
             android:id="@+id/sunset_imageView"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
+            sunDataVisibility="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:contentDescription="@string/sunset"
@@ -130,8 +129,7 @@
 
         <TextView
             android:id="@+id/sunset_textView"
-            hideSunDataIfInErrorState="@{sharedViewModel.inErrorState}"
-            loadingInProgress="@{sharedViewModel.loadingProgress}"
+            sunDataVisibility="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -139,7 +137,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="27sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/top_bar_background"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_bar_background"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="@id/sunset_imageView"
             app:layout_constraintRight_toRightOf="@id/sunset_imageView"
@@ -148,10 +146,10 @@
             tools:visibility="visible" />
 
         <View
-            android:id="@+id/top_bar_background"
+            android:id="@+id/bottom_bar_background"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@android:color/white"
+            android:background="@color/colorBackgroundVariant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="@id/horizontal_bar" />
 
@@ -169,17 +167,17 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginBottom="@dimen/margin_small"
-            android:alpha="0.6"
             android:contentDescription="@string/current_location"
             android:paddingBottom="@dimen/margin_extra_extra_small"
-            android:src="@drawable/ic_map_marker_black_24dp"
+            android:src="@drawable/ic_place_black_24dp"
+            android:tint="?attr/colorOnBackgroundVariant"
             app:layout_constraintBottom_toTopOf="@id/date_imageView"
             app:layout_constraintLeft_toLeftOf="parent" />
 
         <TextView
             android:id="@+id/location_textView"
             homeFragmentCityName="@{sharedViewModel.place}"
-            locationPermissionGranted="@{sharedViewModel.locationPermissionGrantedState}"
+            networkState="@{sharedViewModel.networkState}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/margin_small"
@@ -196,9 +194,9 @@
             android:layout_marginStart="@dimen/margin_normal"
             android:layout_marginTop="@dimen/margin_small"
             android:layout_marginBottom="@dimen/margin_normal"
-            android:alpha="0.6"
             android:contentDescription="@string/date"
-            android:src="@drawable/baseline_today_black_24"
+            android:src="@drawable/ic_today_black_24dp"
+            android:tint="?attr/colorOnBackgroundVariant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -218,14 +216,15 @@
 
         <Button
             android:id="@+id/options_button"
+            style="@style/MyTextButtonTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
-            android:background="?attr/selectableItemBackground"
+            android:letterSpacing="0"
             android:onClick="@{() -> sharedViewModel.showOptionsBottomSheet()}"
             android:text="@string/location_button"
-            android:textColor="@color/colorAccent"
-            android:textSize="16sp"
+            android:textColor="?attr/colorAccent"
+            android:textSize="17sp"
             app:layout_constraintBottom_toBottomOf="@id/date_imageView"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@id/location_imageView" />

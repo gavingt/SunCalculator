@@ -11,18 +11,6 @@ import com.squareup.moshi.JsonClass
  */
 
 /**
- * VideoHolder holds a list of Videos.
- *
- * This is to parse first level of our network result which looks like
- *
- * {
- *   "videos": []
- * }
- */
-/*@JsonClass(generateAdapter = true)
-data class NetworkVideoContainer(val videos: List<NetworkVideo>)*/
-
-/**
  * Represents data for the time zone at the location we specify in the request URL.
  */
 @JsonClass(generateAdapter = true)

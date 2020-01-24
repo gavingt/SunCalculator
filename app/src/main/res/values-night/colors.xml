@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#37474f</color>
+    <color name="colorPrimaryDark">#263238</color>
+    <color name="colorPrimaryLight">#8eacbb</color>
+    <color name="colorAccent">#29b6f6</color>
+    <color name="colorBackground">#141414</color>
+    <color name="colorBackgroundVariant">#202020</color>
+    <color name="colorOnBackground">#FFFFFF</color>
+    <color name="colorOnBackgroundVariant">#D0D0D0</color>
+    <color name="colorOnBackgroundMediumContrast">#999999</color>
+    <color name="colorOnBackgroundLowContrast">#777777</color>
+    <color name="colorBottomSheetBackground">#2B2B2B</color>
+    <color name="colorErrorText">#E31E1E</color>
+</resources>

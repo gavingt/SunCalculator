@@ -10,21 +10,31 @@ import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.BuildConfig
 import com.gavinsappcreations.sunrisesunsettimes.R
+import com.gavinsappcreations.sunrisesunsettimes.databinding.ActivityMainBinding
+import com.gavinsappcreations.sunrisesunsettimes.network.NetworkState
 import com.gavinsappcreations.sunrisesunsettimes.utilities.MILLISECONDS_PER_MINUTE
 import com.gavinsappcreations.sunrisesunsettimes.utilities.REQUEST_PERMISSIONS_LOCATION_ONLY_REQUEST_CODE
+import com.gavinsappcreations.sunrisesunsettimes.utilities.isLocationEnabled
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
 import java.util.*
 
+
 class MainActivity : AppCompatActivity() {
 
-    //Create sharedViewModel as an AndroidViewModel, passing in Application to the Factory.
+    lateinit var binding: ActivityMainBinding
+
+    // Create sharedViewModel as an AndroidViewModel, passing in Application to the Factory.
     private val sharedViewModel: SharedViewModel by lazy {
         ViewModelProviders.of(this, SharedViewModel.Factory(application))
             .get(SharedViewModel::class.java)
@@ -35,27 +45,35 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        title = getString(R.string.app_name)
 
-        //If place is null, we fetch the user's location.
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.toolbar.title = getString(R.string.app_name)
+
+        // If place is null, we fetch the user's location.
         sharedViewModel.place.observe(this, Observer {
             if (it == null) {
-                requestLocationPermission()
+                requestLocationFromFusedLocationProvider()
             }
         })
 
-        requestLocationPermission()
+        /**
+         * Only request location permission if we're not using a custom location. Otherwise, if the
+         * user denied the permission, they'd be prompted with the permission dialog on every
+         * configuration change.
+         */
+        if (sharedViewModel.usingCustomLocation.value != true) {
+            requestLocationFromFusedLocationProvider()
+        }
 
         sharedViewModel.triggerRequestLocationPermissionEvent.observe(this, Observer {
             if (it == true) {
-                requestLocationPermission()
+                requestLocationFromFusedLocationProvider()
                 sharedViewModel.doneRequestingLocationPermission()
             }
         })
     }
 
-    private fun requestLocationPermission() {
+    private fun requestLocationFromFusedLocationProvider() {
         val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(
             this,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -83,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setPositiveButton(
             "Enable permission"
-        ) { dialog, id ->
+        ) { _, _ ->
             // User wants to enable Location permission
             if (bUserCheckedDontShowAgainBox) {
                 val intent = Intent()
@@ -105,6 +123,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         builder.setNegativeButton(getString(R.string.use_custom_location)) { _, _ ->
+            sharedViewModel.onNetworkStateChanged(NetworkState.PermissionDenied)
             sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue = true)
             alertDialog?.dismiss()
         }
@@ -129,20 +148,49 @@ class MainActivity : AppCompatActivity() {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             /**
-             * If locationPermissionGranted.value != true and we've made it here, this means
-             * we've just granted the permission from the BottomSheet. So to set the RadioButton
-             * back to "Using current location", we need to change usingCustomLocation.value here.
+             * If networkState.value == NetworkState.AwaitingPermission, this means either
+             * we've just started the app or we've just granted the permission from the BottomSheet.
+             * So to set the RadioButton back to "Using current location", we need to change
+             * usingCustomLocation.value here. Also, to set a new place.value, we need to set the
+             * existing place.value to null, since it could possibly be a custom location
+             * (and therefore the onPlaceChanged() method further below wouldn't get called.
              */
-            if (sharedViewModel.locationPermissionGrantedState.value != true) {
+            if (sharedViewModel.networkState.value == NetworkState.AwaitingPermission) {
                 sharedViewModel.onUsingCustomLocationChanged(false)
+                sharedViewModel.onPlaceChanged(null)
             }
 
-            sharedViewModel.onLocationPermissionGrantedStateChanged(true)
+
+            /**
+             * If using current location and we already have the current location, don't try to
+             * re-fetch current location. This fixes a problem that was caused when the user
+             * disabled Location on their device and then toggled dark theme, which would cause
+             * the error Views to appear on top of the sun data views.
+             */
+            if (sharedViewModel.usingCustomLocation.value != true && sharedViewModel.place.value != null) {
+                return
+            }
 
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                // Got last known location. In some rare situations this can be null.
-                location ?: return@addOnSuccessListener
+                if (location == null) {
+                    if (isLocationEnabled(application)) {
+                        /**
+                         * If location is null and the device has location enabled, we can for the
+                         * device to fetch a location by creating our own LocationRequest.
+                         */
+                        forceFetchLocation()
+                    } else {
+                        /**
+                         * If location is null and the device has location disabled, we change
+                         * the network state to NetworkState.LocationDisabled so we can alert
+                         * the user.
+                         */
+                        sharedViewModel.onNetworkStateChanged(NetworkState.LocationDisabled)
+                    }
+                    return@addOnSuccessListener
+                }
+
                 val placeBuilder = Place.builder()
                 placeBuilder.setLatLng(LatLng(location.latitude, location.longitude))
                 placeBuilder.setName(getString(R.string.current_location))
@@ -160,14 +208,41 @@ class MainActivity : AppCompatActivity() {
                 if (sharedViewModel.place.value == null) {
                     sharedViewModel.onPlaceChanged(placeBuilder.build())
                 }
-
-
             }
 
-        } else { // Permission was denied and user checked the "Don't ask again" checkbox.
-            sharedViewModel.onLocationPermissionGrantedStateChanged(null)
+        } else { // Permission was denied.
+            sharedViewModel.onNetworkStateChanged(NetworkState.PermissionDenied)
+            sharedViewModel.onUsingCustomLocationChanged(usingCustomLocationNewValue = true)
             showUserDeniedPermissionsAlertDialog(true)
         }
+    }
+
+
+    /**
+     * If user recently toggled their Location setting off/on on their device, FusedLocationProvider
+     * will return a null location. This method forces the device to find a location by forming a
+     * LocationRequest and repeating until it gets a non-null Location result.
+     */
+    private fun forceFetchLocation() {
+        val locationRequest = LocationRequest.create()
+        locationRequest.interval = 2500
+        locationRequest.fastestInterval = 5000
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        val locationCallback: LocationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                val mostRecentLocation = locationResult.lastLocation
+                if (mostRecentLocation != null) {
+                    // We found a location, so we can now stop further location updates.
+                    LocationServices.getFusedLocationProviderClient(this@MainActivity)
+                        .removeLocationUpdates(this)
+
+                    // Now that the device has a location, request it from FusedLocationProvider.
+                    requestLocationFromFusedLocationProvider()
+                }
+            }
+        }
+        LocationServices.getFusedLocationProviderClient(this)
+            .requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
 }

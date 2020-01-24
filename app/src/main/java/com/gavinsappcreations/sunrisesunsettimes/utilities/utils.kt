@@ -1,11 +1,23 @@
 package com.gavinsappcreations.sunrisesunsettimes.utilities
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
+import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Handler
 import android.util.Log
+import android.util.TypedValue
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,7 +28,7 @@ import java.util.*
  */
 fun formatDateResultFromApi(apiDateString: String, timeZone: TimeZone): String {
 
-    //Parse the date string returned by the API into a Date object.
+    // Parse the date string returned by the API into a Date object.
     val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss aa", Locale.ENGLISH)
     val apiDate = simpleDateFormat.parse(apiDateString)
 
@@ -29,7 +41,7 @@ fun formatDateResultFromApi(apiDateString: String, timeZone: TimeZone): String {
     calendar.add(Calendar.MILLISECOND, timeZone.getOffset(calendar.timeInMillis))
     val correctedDate = calendar.time
 
-    //Apply the time pattern we want to show in our app.
+    // Apply the time pattern we want to show in our app.
     simpleDateFormat.applyPattern("hh:mm aa")
     return simpleDateFormat.format(correctedDate)
 }
@@ -54,7 +66,7 @@ fun waitForDatePickerToSettle(
 }
 
 
-//Tests if network connection is available.
+// Tests if network connection is available
 fun isNetworkAvailable(context: Context?): Boolean {
     if (context == null) return false
     val connectivityManager =
@@ -80,4 +92,33 @@ fun isNetworkAvailable(context: Context?): Boolean {
         }
     }
     return false
+}
+
+
+// Returns true if device has location enabled, and false if it's disabled.
+fun isLocationEnabled(application: Application) : Boolean {
+    val locationManager = application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+}
+
+
+
+// We use this method to get the default text color programmatically
+fun resolveThemeAttr(context: Context, @AttrRes attrRes: Int): TypedValue {
+    val theme = context.theme
+    val typedValue = TypedValue()
+    theme.resolveAttribute(attrRes, typedValue, true)
+    return typedValue
+}
+
+// We use this method to get the default text color programmatically
+@ColorInt
+fun resolveColorAttr(context: Context, @AttrRes colorAttr: Int): Int {
+    val resolvedAttr = resolveThemeAttr(context, colorAttr)
+    // resourceId is used if it's a ColorStateList, and data if it's a color reference or a hex color
+    val colorRes = if (resolvedAttr.resourceId != 0)
+        resolvedAttr.resourceId
+    else
+        resolvedAttr.data
+    return ContextCompat.getColor(context, colorRes)
 }

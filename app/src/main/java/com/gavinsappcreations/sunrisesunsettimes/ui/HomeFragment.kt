@@ -10,10 +10,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class HomeFragment : Fragment() {
 
-    //Get reference to sharedViewModel that was already created by MainActivity.
+    // Get reference to sharedViewModel that was already created by MainActivity.
     private val sharedViewModel: SharedViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java)
     }
@@ -43,18 +45,19 @@ class HomeFragment : Fragment() {
     }
 
 
-    //This shows the OptionsBottomSheet that lets you change location, date, and toggle online/offline fetching.
+    // This shows the OptionsBottomSheet that lets you change location, date, and toggle online/offline fetching.
     private fun showOptionsBottomSheet() {
         val fragment =
             requireActivity().supportFragmentManager.findFragmentByTag("options_fragment")
 
-        //Prevent multiple BottomSheets from showing by null checking.
+        // Prevent multiple BottomSheets from showing by null checking.
         if (fragment == null) {
             OptionsBottomSheetFragment()
                 .show(
                     requireActivity().supportFragmentManager,
                     "options_fragment"
                 )
+
         }
     }
 
