@@ -102,7 +102,7 @@ fun ProgressBar.updateProgressBarProgress(
         NetworkState.AwaitingPermission, NetworkState.LocationDisabled -> {
             return
         }
-        NetworkState.NetworkFailure -> {
+        NetworkState.NetworkFailure, NetworkState.PermissionDenied -> {
             visibility = View.GONE
             return
         }
