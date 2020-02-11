@@ -155,7 +155,8 @@ class MainActivity : AppCompatActivity() {
              * existing place.value to null, since it could possibly be a custom location
              * (and therefore the onPlaceChanged() method further below wouldn't get called.
              */
-            if (sharedViewModel.networkState.value == NetworkState.AwaitingPermission) {
+            if (sharedViewModel.networkState.value == NetworkState.AwaitingPermission
+               || sharedViewModel.networkState.value == NetworkState.PermissionDenied) {
                 sharedViewModel.onUsingCustomLocationChanged(false)
                 sharedViewModel.onPlaceChanged(null)
             }
