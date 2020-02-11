@@ -2,6 +2,8 @@ package com.gavinsappcreations.sunrisesunsettimes.ui
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
+import androidx.lifecycle.Observer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

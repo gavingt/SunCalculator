@@ -1,7 +1,6 @@
 package com.gavinsappcreations.sunrisesunsettimes.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +9,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.gavinsappcreations.sunrisesunsettimes.databinding.FragmentHomeBinding
 import com.gavinsappcreations.sunrisesunsettimes.viewmodels.SharedViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class HomeFragment : Fragment() {
 
@@ -34,7 +31,9 @@ class HomeFragment : Fragment() {
         // Giving the binding access to the OfflineViewModel
         binding.sharedViewModel = sharedViewModel
 
-        sharedViewModel.triggerOptionsBottomSheetEvent.observe(this, Observer {
+
+
+        sharedViewModel.triggerOptionsBottomSheetEvent.observe(viewLifecycleOwner, Observer {
             if (it == true) {
                 showOptionsBottomSheet()
                 sharedViewModel.doneShowingOptionsBottomSheet()

@@ -32,7 +32,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     // Create sharedViewModel as an AndroidViewModel, passing in Application to the Factory.
     private val sharedViewModel: SharedViewModel by lazy {
@@ -155,7 +155,8 @@ class MainActivity : AppCompatActivity() {
              * existing place.value to null, since it could possibly be a custom location
              * (and therefore the onPlaceChanged() method further below wouldn't get called.
              */
-            if (sharedViewModel.networkState.value == NetworkState.AwaitingPermission) {
+            if (sharedViewModel.networkState.value == NetworkState.AwaitingPermission
+                || sharedViewModel.networkState.value == NetworkState.PermissionDenied) {
                 sharedViewModel.onUsingCustomLocationChanged(false)
                 sharedViewModel.onPlaceChanged(null)
             }
