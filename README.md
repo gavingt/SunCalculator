@@ -5,5 +5,6 @@ To use, simply locate /utilities/constants.kt and add a Google API key that has 
 
 Or, if you just want to try the app for yourself, [download the APK here](https://github.com/gavingt/SunCalculator/blob/master/app/SunCalculator.apk).
 
-![screenshot](https://i.imgur.com/TYQiuY9.png)
+<img src="https://i.imgur.com/TYQiuY9.png" width="350">
+
 
