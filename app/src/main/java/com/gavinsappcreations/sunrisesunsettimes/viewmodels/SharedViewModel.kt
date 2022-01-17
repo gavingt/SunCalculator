@@ -194,7 +194,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
     //Factory for constructing SharedViewModel with Application parameter.
     class Factory(private val application: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SharedViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
                 return SharedViewModel(application) as T
